@@ -1,0 +1,13 @@
+---
+- :category: gas
+  :date: 9/20/17
+  :amount: 50
+- :category: grocery
+  :date: 9/21/17
+  :amount: 100
+- :category: Diapers
+  :date: 9/21/17
+  :amount: '59.99'
+- :category: Car Payment
+  :date: 9/21/17
+  :amount: '200'

@@ -1,0 +1,29 @@
+<h1>Welcome to easy budget!</h1>
+
+
+
+<h2>Recent Spending:</h2>
+
+<ul>
+
+  <% @purchases.each do |purchase| %>
+    <li class="purchase">
+      $<%= purchase[:amount] %> in the <%= purchase[:category] %> category on <%= purchase[:date] %>
+    </li>
+  <% end %>
+</ul>
+
+<form action="/add_spending" method="get">
+  <button type="submit">Add Spending</button>
+</form>
+
+<% if session[:username] %>
+  <p class="user-status">Signed in as <%= session[:username] %>
+  <form action="/users/signout" method="post">
+    <button type="submit">Sign Out</button>
+  </form>
+<% else %>
+  <form action="/users/signin" method="get">
+    <button type="submit">Sign In</button>
+  </form>
+<% end %>

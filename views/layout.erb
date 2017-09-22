@@ -1,9 +1,13 @@
 <html>
   <head>
     <title>Easy Budget</title>
+    <link rel="text/stylesheet" href="/stylesheets/cms.css" >
   </head>
 
   <body>
+  <% if session[:message] %>
+    <p class="message"><%= session.delete(:message) %></p>
+  <% end %>
   <%= yield %>
   </body>
   

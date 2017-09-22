@@ -1,0 +1,25 @@
+<h1>Add a Purchase:</h1>
+
+<form action="/save_purchase" method="post">
+  
+    <label for="date">Date:</label>
+
+    <div>
+    <input name="date" id="date" value="<% Time.now.to_s %>">
+    </div>
+
+    <label for="category">Category:</label>
+
+    <div>
+    <input name="category" id="category">
+    </div>
+
+    <label for="amount">Amount:</label>
+
+    <div>
+    <input name="amount" id="amount">
+    </div>
+
+    <button type="submit">Save Purchase</button>
+</form>
+
