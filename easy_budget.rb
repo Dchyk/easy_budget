@@ -24,7 +24,7 @@ def require_signin
 end
 
 def load_credentials
-  YAML.load_file(get_credentials_path)
+  YAML.load_file(get_yaml_path("users.yaml"))
 end
 
 def get_data_path
@@ -52,6 +52,15 @@ def save_purchase(purchase)
     end
 end
 
+def save_budget(budget)
+  budget_file = load_yaml_file("budget.yaml")
+  budget_file << budget
+
+  File.open(get_yaml_path("budget.yaml"), "w") do |file|
+      file.write(purchases.to_yaml)
+    end
+end
+
 def test_yaml_spending
   spending = []
 
@@ -63,10 +72,17 @@ def test_yaml_spending
   save_purchase(spending)
 end
 
+helpers do 
+  # Define view helper to add up total monthly income
+  # etc.?
+end
+
 get "/" do
   require_signin
 
   #test_yaml_spending
+
+  @budget = load_yaml_file("budget.yaml")
 
   @purchases = load_yaml_file("spending.yaml")
 
@@ -116,4 +132,34 @@ post "/save_purchase" do
   save_purchase(purchase)
   session[:message] = "Purchase successfully recorded."
   redirect "/"
+end
+
+get "/budget/create_budget" do
+
+  erb :create_budget
+
+end
+
+post "/budget/add_income" do 
+  monthly_income = { income: params[:income] }
+
+  budget_file = load_yaml_file("budget.yaml")
+  budget_file[:monthly_income] = monthly_income
+
+
+
+  session[:message] = "Income successfully recorded."
+  redirect "/budget/add_categories"
+end
+
+get "/budget/edit_income" do
+
+  @budget = load_yaml_file("budget.yaml")
+  erb :edit_income
+
+end
+
+post "/budget/update_income" do
+
+
 end

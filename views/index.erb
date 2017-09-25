@@ -1,5 +1,30 @@
 <h1>Welcome to easy budget!</h1>
+  <% if @budget %>
+    
+    <h2>Here's a breakdown of your monthly budget:</h2>
+    
+    <p>Monthly Income: $<%= @budget["monthly_income"] %>
+      <form action="/budget/edit_income" method="get">
+      <button class="inline" type="submit">Edit Income</button>
+  </form>
+    </p>
+    <p>Monthly Expense Categories:</p>
+    
+    <ul>
+      <% @budget["categories"].each do |category, amount| %>
+        <li class="expense-category">
+          <%= category %>: $<%= amount %>
+        </li>
+      <% end %>
+    </ul>
 
+  <form action="/budget/edit_budget" method="get">
+    <button type="submit">Edit Expenses</button>
+  </form>
+
+  <% else %>
+    <h2>Ready to create your budget? <a href="/budget/create_budget">Click to get started!</a></h2>
+  <% end %>
 
 
 <h2>Recent Spending:</h2>
