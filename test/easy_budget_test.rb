@@ -85,7 +85,16 @@ class EasyBudgetTest < Minitest::Test
   end
 
   def test_add_category
-    skip
+    get "/budget/add_category", {}, admin_session
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "Add a Category of Monthly Expenses:"
+
+    post "/budget/add_category", category_name: "Test", amount: 130
+    assert_equal "Test category added to monthly expenses.", session[:message]
+
+    get last_response["Location"]
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "Test: $130" # This line isn't working
   end
 
   def test_add_invalid_category

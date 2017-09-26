@@ -12,7 +12,7 @@
 
     <div>
       <select name="category" id="category">
-        <% @budget["categories"].each do |category_name, _| %>
+        <% @budget[:categories].each do |category_name, _| %>
           <option value="<%= category_name %>"><%= category_name %></option>
         <% end %>
       </select>

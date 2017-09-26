@@ -1,34 +1,7 @@
 ---
-- :category: gas
-  :date: 9/20/17
-  :amount: 50
-- :category: grocery
-  :date: 9/21/17
-  :amount: 100
-- :category: Diapers
-  :date: 9/21/17
-  :amount: '59.99'
-- :category: Car Payment
-  :date: 9/21/17
-  :amount: '200'
-- :category: Not sure
-  :date: 9/21/17
-  :amount: '55.64'
-- :category: Easting out
-  :date: 9/25/17
-  :amount: '96.66'
 - :category: Gas
-  :date: 9/28/17
+  :date: 9/26/2017
   :amount: '20'
 - :category: Diaper Bags
-  :date: 9/25/17
-  :amount: '15'
-- :category: Gas
-  :date: 9/25/2017
-  :amount: '50'
-- :category: Gas
-  :date: 9/25/2017
-  :amount: '0'
-- :category: Groceries
-  :date: 9/25/2017
-  :amount: '5642'
+  :date: 9/26/2017
+  :amount: '32'

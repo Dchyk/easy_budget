@@ -3,24 +3,48 @@
     
     <h2>Here's a breakdown of your monthly budget:</h2>
     
-    <p>Monthly Income: $<%= @budget["monthly income"] %>
-      <form action="/budget/edit_income" method="get">
-      <button class="inline" type="submit">Edit Income</button>
-  </form>
+    <p>Monthly Income: $<%= @budget[:monthly_income] %>
+      <form class="inline" action="/budget/edit_income" method="get">
+        <button type="submit">Edit Income</button>
+      </form>
     </p>
     <p>Monthly Expense Categories:</p>
 
-    <% if @budget["categories"].nil? %>
+    <% if @budget[:categories].nil? %>
       <p>You haven't added any categories yet!</p>
     <% else %>
     
       <ul>
-        <% @budget["categories"].each do |category, amount| %>
+        <% @budget[:categories].each do |category, amount| %>
           <li class="expense-category">
             <%= category %>: $<%= amount %>
+            <form class="inline" action="/budget/<%= category %>/edit" method="get">
+              <button type="submit">Edit</button>
+            </form>
+            <form class="inline" action="/budget/<%= category %>/delete" method="get">
+              <button type="submit">Delete</button>
+            </form>
           </li>
         <% end %>
       </ul>
+
+      <% if @purchases.nil? %>
+        <p>You haven't added any categories yet!</p>
+      <% else %>
+
+      <h2>Total spending this month by category:
+
+      <ul>
+        <% @budget[:categories].each do |category, _| %>
+          <li class="expense-category">
+            <%= category %>: $<%= total_spending_in_one_category(category) %> / <%= @budget[:categories][category] %>
+          </li>
+        <% end %>
+
+      </ul>
+
+      <% end %>
+
     <% end %>
 
   <form action="/budget/add_category" method="get">
@@ -34,14 +58,19 @@
 
 <h2>Recent Spending:</h2>
 
-<ul>
+  <% if @purchases.nil? %>
+    <p>You haven't added any categories yet!</p>
+  <% else %>
 
-  <% @purchases.each do |purchase| %>
-    <li class="purchase">
-      $<%= purchase[:amount] %> in the <%= purchase[:category] %> category on <%= purchase[:date] %>
-    </li>
-  <% end %>
-</ul>
+  <ul>
+    <% @purchases.each do |purchase| %>
+      <li class="purchase">
+        $<%= purchase[:amount] %> in the <%= purchase[:category] %> category on <%= purchase[:date] %>
+      </li>
+    <% end %>
+  </ul>
+
+    <% end %>
 
 <form action="/add_spending" method="get">
   <button type="submit">Add Spending</button>

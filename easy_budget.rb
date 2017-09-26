@@ -45,6 +45,11 @@ end
 
 def save_purchase(purchase)
   purchases = load_yaml_file("spending.yaml")
+  
+  if purchases.nil?
+    purchases = []
+  end
+
   purchases << purchase
 
   File.open(get_yaml_path("spending.yaml"), "w") do |file|
@@ -54,7 +59,7 @@ end
 
 def save_income(income)
   budget_file = load_yaml_file("budget.yaml")
-  budget_file["monthly income"] = income
+  budget_file[:monthly_income] = income
 
   File.open(get_yaml_path("budget.yaml"), "w") do |file|
       file.write(budget_file.to_yaml)
@@ -64,10 +69,10 @@ end
 def add_expense_category(category_name, amount)
   budget_file = load_yaml_file("budget.yaml")
 
-  if budget_file["categories"].nil?
-    budget_file["categories"] = { category_name => amount }
+  if budget_file[:categories].nil?
+    budget_file[:categories] = { category_name => amount }
   else
-    budget_file["categories"][category_name] = amount
+    budget_file[:categories][category_name] = amount
   end
 
   File.open(get_yaml_path("budget.yaml"), "w") do |file|
@@ -76,15 +81,38 @@ def add_expense_category(category_name, amount)
 end
 
 def invalid_number?(input)
-  input.size == 0 || input.match(/\D/)
+  no_value?(input) || input.match(/\D/)
 end
 
-def validate_purchase()
+def invalid_name?(input)
+  no_value?(input) == 0 || input.match(/\W/)
+end
 
-helpers do 
-  def total_spending
+def no_value?(input)
+  input.size == 0
+end
+
+def validate_purchase
+  # needed
+end
+
+helpers do
+  def total_spending_in_one_category(category)
     spending = load_yaml_file("spending.yaml")
-    spending
+    category_spending = spending.select { |purchase| purchase[:category] == category }
+    total = category_spending.map { |selected_purchase| selected_purchase[:amount].to_i }.inject(&:+)
+    total || 0
+  end
+
+  def total_money_budgeted
+    budget = load_yaml_file("budget.yaml")
+
+    budget[:categories].map { |_, amount| amount.to_i }.inject(&:+)
+  end
+
+  def money_available_to_budget
+    budget_file = load_yaml_file("budget.yaml")
+    budget_file[:monthly_income].to_i - total_money_budgeted
   end
 
   def todays_date
@@ -180,10 +208,18 @@ get "/budget/add_category" do
 end
 
 post "/budget/add_category" do
-  category_name = params[:category_name]
-  amount = params[:amount]
+  category_name = params[:category_name].strip
+  amount = params[:amount].strip
 
-  add_expense_category(category_name, amount)
-  session[:message] = "#{category_name} category added to monthly expenses."
-  redirect "/"
+  if invalid_number?(amount)
+    session[:message] = "Invalid number - please enter a positive number."
+    erb :add_category
+  elsif invalid_name?(category_name)
+    session[:message] = "Invalid category name - only numbers and letters allowed!"
+    erb :add_category
+  else
+    add_expense_category(category_name, amount)
+    session[:message] = "#{category_name} category added to monthly expenses."
+    redirect "/"
+  end
 end

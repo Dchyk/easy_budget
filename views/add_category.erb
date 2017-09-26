@@ -11,8 +11,10 @@
     <label for="amount">Amount to budget:</label>
 
     <div>
-    <input name="amount" id="amount" value="$0">
+    $<input type="number" name="amount" id="amount" value="$0">
     </div>
 
     <button type="submit">Save</button>
 </form>
+
+<h2>Total money budgeted so far: <%= total_money_budgeted %> / Available to budget: <%= money_available_to_budget %></h2>
