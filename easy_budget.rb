@@ -52,38 +52,51 @@ def save_purchase(purchase)
     end
 end
 
-def save_budget(budget)
+def save_income(income)
   budget_file = load_yaml_file("budget.yaml")
-  budget_file << budget
+  budget_file["monthly income"] = income
 
   File.open(get_yaml_path("budget.yaml"), "w") do |file|
-      file.write(purchases.to_yaml)
+      file.write(budget_file.to_yaml)
     end
 end
 
-def test_yaml_spending
-  spending = []
+def add_expense_category(category_name, amount)
+  budget_file = load_yaml_file("budget.yaml")
 
+  if budget_file["categories"].nil?
+    budget_file["categories"] = { category_name => amount }
+  else
+    budget_file["categories"][category_name] = amount
+  end
 
-  spending << {category: "gas", date: "9/20/17", amount: 50}
-  spending << {category: "grocery", date: "9/21/17", amount: 100}
-
-
-  save_purchase(spending)
+  File.open(get_yaml_path("budget.yaml"), "w") do |file|
+      file.write(budget_file.to_yaml)
+    end  
 end
 
+def invalid_number?(input)
+  input.size == 0 || input.match(/\D/)
+end
+
+def validate_purchase()
+
 helpers do 
-  # Define view helper to add up total monthly income
-  # etc.?
+  def total_spending
+    spending = load_yaml_file("spending.yaml")
+    spending
+  end
+
+  def todays_date
+    date = Time.now
+    "#{date.month}/#{date.day}/#{date.year}"
+  end
 end
 
 get "/" do
   require_signin
 
-  #test_yaml_spending
-
   @budget = load_yaml_file("budget.yaml")
-
   @purchases = load_yaml_file("spending.yaml")
 
   erb :index
@@ -117,13 +130,16 @@ post "/users/signout" do
 end
 
 get "/add_spending" do
-  # Require a budget to exist
   require_signed_in_user
+
+  @budget = load_yaml_file("budget.yaml") 
 
   erb :add_spending
 end
 
 post "/save_purchase" do
+  #validate_purchase
+
   purchase = { category: params[:category],
                date:     params[:date],
                amount:   params[:amount]
@@ -134,32 +150,40 @@ post "/save_purchase" do
   redirect "/"
 end
 
-get "/budget/create_budget" do
-
-  erb :create_budget
-
+get "/budget/edit_income" do
+  @budget = load_yaml_file("budget.yaml")
+  erb :edit_income
 end
 
-post "/budget/add_income" do 
-  monthly_income = { income: params[:income] }
+post "/budget/edit_income" do 
+  monthly_income = params[:income].strip
 
-  budget_file = load_yaml_file("budget.yaml")
-  budget_file[:monthly_income] = monthly_income
-
-
-
-  session[:message] = "Income successfully recorded."
-  redirect "/budget/add_categories"
+  if invalid_number?(monthly_income)
+    session[:message] = "Invalid number!"
+    status 422
+    redirect "/budget/edit_income"
+  else
+    save_income(monthly_income)
+    
+    session[:message] = "Income successfully recorded."
+    redirect "/"
+  end
 end
 
 get "/budget/edit_income" do
-
   @budget = load_yaml_file("budget.yaml")
   erb :edit_income
-
 end
 
-post "/budget/update_income" do
+get "/budget/add_category" do
+  erb :add_category
+end
 
+post "/budget/add_category" do
+  category_name = params[:category_name]
+  amount = params[:amount]
 
+  add_expense_category(category_name, amount)
+  session[:message] = "#{category_name} category added to monthly expenses."
+  redirect "/"
 end

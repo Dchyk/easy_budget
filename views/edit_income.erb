@@ -1,11 +1,11 @@
 <h1>Update your monthly income</h1>
 
-<form action="/budget/add_income" method="post">
+<form action="/budget/edit_income" method="post">
   
     <label for="income">Income:</label>
 
     <div>
-    <input name="income" id="income" value="<%= @budget["monthly_income"] %>">
+    <input name="income" id="income" value="<%= @budget["monthly income"] %>">
     </div>
 
     <button type="submit">Save</button>

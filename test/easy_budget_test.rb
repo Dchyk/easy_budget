@@ -83,4 +83,48 @@ class EasyBudgetTest < Minitest::Test
     #
     # assert_includes last_response.body, "$59.68 in the Restaurants category on 9/21/17"
   end
+
+  def test_add_category
+    skip
+  end
+
+  def test_add_invalid_category
+    skip
+  end
+
+  def test_edit_and_save_income
+    skip
+  end
+
+  def test_edit_income_invalid_input
+    skip
+  end
+
+  def test_edit_category
+    skip
+  end
+
+  def test_edit_category_invalid_input
+    skip
+  end
+
+  def test_delete_category
+    skip
+  end
+
+  def test_view_all_spending
+    skip
+  end
+
+  def test_edit_and_save_purchase
+    skip
+  end
+
+  def test_edit_purchase_invalid_input
+    skip
+  end
+
+  def test_delete_purchase
+    skip
+  end
 end

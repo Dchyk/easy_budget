@@ -3,23 +3,28 @@
     
     <h2>Here's a breakdown of your monthly budget:</h2>
     
-    <p>Monthly Income: $<%= @budget["monthly_income"] %>
+    <p>Monthly Income: $<%= @budget["monthly income"] %>
       <form action="/budget/edit_income" method="get">
       <button class="inline" type="submit">Edit Income</button>
   </form>
     </p>
     <p>Monthly Expense Categories:</p>
-    
-    <ul>
-      <% @budget["categories"].each do |category, amount| %>
-        <li class="expense-category">
-          <%= category %>: $<%= amount %>
-        </li>
-      <% end %>
-    </ul>
 
-  <form action="/budget/edit_budget" method="get">
-    <button type="submit">Edit Expenses</button>
+    <% if @budget["categories"].nil? %>
+      <p>You haven't added any categories yet!</p>
+    <% else %>
+    
+      <ul>
+        <% @budget["categories"].each do |category, amount| %>
+          <li class="expense-category">
+            <%= category %>: $<%= amount %>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+
+  <form action="/budget/add_category" method="get">
+    <button type="submit">Add Category</button>
   </form>
 
   <% else %>

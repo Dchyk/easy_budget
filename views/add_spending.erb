@@ -5,21 +5,26 @@
     <label for="date">Date:</label>
 
     <div>
-    <input name="date" id="date" value="<% Time.now.to_s %>">
+    <input type="date" name="date" id="date" value="<%= todays_date %>">
     </div>
 
     <label for="category">Category:</label>
 
     <div>
-    <input name="category" id="category">
+      <select name="category" id="category">
+        <% @budget["categories"].each do |category_name, _| %>
+          <option value="<%= category_name %>"><%= category_name %></option>
+        <% end %>
+      </select>
     </div>
 
     <label for="amount">Amount:</label>
 
-    <div>
-    <input name="amount" id="amount">
+    <div> <!-- Forces the user to input a number -->
+    <input type="number" name="amount" id="amount">
     </div>
 
     <button type="submit">Save Purchase</button>
 </form>
 
+<a href="/">Cancel</a>
