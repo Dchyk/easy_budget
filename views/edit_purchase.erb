@@ -1,0 +1,30 @@
+<h1>Edit Purchase:</h1>
+
+<form action="/budget/purchases/<%= params[:purchase_id] %>/update" method="post">
+  
+    <label for="date">Date:</label>
+
+    <div>
+    <input type="date" name="date" id="date" value="<%= @purchase[:date] %>">
+    </div>
+
+    <label for="category">Category:</label>
+
+    <div>
+      <select name="category" id="category">
+        <% @budget[:categories].each do |category_name, _| %>
+          <option value="<%= category_name %>"><%= category_name %></option>
+        <% end %>
+      </select>
+    </div>
+
+    <label for="amount">Amount:</label>
+
+    <div> <!-- Forces the user to input a number -->
+    <input type="number" name="amount" id="amount" value="<%= @purchase[:date] %>">
+    </div>
+
+    <button type="submit">Save Purchase</button>
+</form>
+
+<a href="/">Cancel</a>

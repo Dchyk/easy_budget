@@ -1,0 +1,24 @@
+<h1>Edit the <%= params[:category_name] %> Category</h1>
+
+<form action="/budget/<%= @category_name %>/update" method="post">
+  
+    <label for="new_category_name">Category Name:</label>
+
+    <div>
+    <input name="new_category_name" id="new_category_name" value="<%= params[:category_name] %>">
+    </div>
+
+    <label for="new_amount">Amount to budget:</label>
+
+    <div>
+    $<input type="number" name="new_amount" id="new_amount" value="<%= @budget[:categories][@category_name] %>">
+    </div>
+
+    <button type="submit">Save</button>
+</form>
+
+<form action="/" method="get">
+  <button type="submit">Cancel</button>
+</form>
+
+<h2>Total money budgeted so far: <%= total_money_budgeted %> / Available to budget: <%= money_available_to_budget %></h2>

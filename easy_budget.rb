@@ -57,13 +57,21 @@ def save_purchase(purchase)
     end
 end
 
+def update_purchase(purchase, index)
+  purchases = load_yaml_file("spending.yaml")
+
+  purchases[index] = purchase
+
+  File.open(get_yaml_path("spending.yaml"), "w") do |file|
+      file.write(purchases.to_yaml)
+    end
+end
+
 def save_income(income)
   budget_file = load_yaml_file("budget.yaml")
   budget_file[:monthly_income] = income
 
-  File.open(get_yaml_path("budget.yaml"), "w") do |file|
-      file.write(budget_file.to_yaml)
-    end
+  save_budget_data_to_yaml(budget_file)
 end
 
 def add_expense_category(category_name, amount)
@@ -75,8 +83,12 @@ def add_expense_category(category_name, amount)
     budget_file[:categories][category_name] = amount
   end
 
+  save_budget_data_to_yaml(budget_file)
+end
+
+def save_budget_data_to_yaml(budget_data)
   File.open(get_yaml_path("budget.yaml"), "w") do |file|
-      file.write(budget_file.to_yaml)
+      file.write(budget_data.to_yaml)
     end  
 end
 
@@ -89,11 +101,15 @@ def invalid_name?(input)
 end
 
 def no_value?(input)
-  input.size == 0
+  input.nil? || input.size == 0
 end
 
 def validate_purchase
   # needed
+end
+
+def more_than_one_category_exists?(budget)
+  budget[:categories].size > 1
 end
 
 helpers do
@@ -107,17 +123,21 @@ helpers do
   def total_money_budgeted
     budget = load_yaml_file("budget.yaml")
 
-    budget[:categories].map { |_, amount| amount.to_i }.inject(&:+)
+    budget[:categories].map { |_, amount| amount.to_i }.inject(&:+) || 0
   end
 
   def money_available_to_budget
     budget_file = load_yaml_file("budget.yaml")
-    budget_file[:monthly_income].to_i - total_money_budgeted
+    budget_file[:monthly_income].to_i - total_money_budgeted || 0
   end
 
   def todays_date
     date = Time.now
     "#{date.month}/#{date.day}/#{date.year}"
+  end
+
+  def categories_exist?(budget)
+    budget[:categories].keys.size > 0
   end
 end
 
@@ -126,7 +146,6 @@ get "/" do
 
   @budget = load_yaml_file("budget.yaml")
   @purchases = load_yaml_file("spending.yaml")
-
   erb :index
 end
 
@@ -222,4 +241,83 @@ post "/budget/add_category" do
     session[:message] = "#{category_name} category added to monthly expenses."
     redirect "/"
   end
+end
+
+get "/budget/:category_name/edit" do
+  @budget = load_yaml_file("budget.yaml")
+
+  @category_name = params[:category_name]
+
+  erb :edit_category
+end
+
+post "/budget/:category_name/update" do
+  # Retain the existing category name in case only the amount is being updated
+  existing_category_name = params[:category_name]
+  new_category_name = params[:new_category_name]
+  new_category_amount = params[:new_amount]
+
+  if invalid_name?(new_category_name)
+    session[:message] = "Invalid category name - must be text."
+    redirect "/budget/#{existing_category_name}/edit"
+  end
+
+  budget = load_yaml_file("budget.yaml")
+
+  if new_category_name == existing_category_name
+    budget[:categories][existing_category_name] = new_category_amount
+    session[:message] = "#{existing_category_name} successfully updated!"
+  else
+    budget[:categories].delete(existing_category_name)
+    budget[:categories][new_category_name] = new_category_amount
+    session[:message] = "#{new_category_name} successfully updated!"
+  end
+
+  save_budget_data_to_yaml(budget)
+
+  redirect "/"
+end
+
+post "/budget/:category_name/delete" do
+  # Force user to have at least one active category
+  #unless more_than_one_category_exists?
+  #  session[:message] = "Can't delete category - you must have at least one category."
+  #  redirect "/"
+  #end
+
+  budget = load_yaml_file("budget.yaml")
+  category_name = params[:category_name]
+
+  # Prevent user-generated URLs to delete files
+  unless budget[:categories].include?(category_name)
+    session[:message] = "Can't delete - that category doesn't exist!"
+    redirect "/"
+  end
+
+  budget[:categories].delete(category_name)
+  save_budget_data_to_yaml(budget)
+
+  session[:message] = "#{category_name} successfully deleted."
+  redirect "/"
+end
+
+get "/budget/purchases/:purchase_id/edit" do
+  purchases = load_yaml_file("spending.yaml")
+  purchase_index = params[:purchase_id].to_i
+  @purchase = purchases[purchase_index]
+  @budget = load_yaml_file("budget.yaml")
+  erb :edit_purchase
+end
+
+post "/budget/purchases/:purchase_id/update" do
+  purchase_index = params[:purchase_id].to_i
+
+  purchase = { category: params[:category],
+               date:     params[:date],
+               amount:   params[:amount]
+              }
+
+  update_purchase(purchase, purchase_index)
+  session[:message] = "Purchase successfully updated."
+  redirect "/"
 end
