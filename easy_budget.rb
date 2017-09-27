@@ -43,6 +43,10 @@ def load_yaml_file(filename)
   YAML.load_file(get_yaml_path(filename))
 end
 
+def format_money(number)
+  number.to_f.round(2).to_s
+end
+
 def save_purchase(purchase)
   purchases = load_yaml_file("spending.yaml")
   
@@ -103,15 +107,23 @@ def save_budget_data_to_yaml(budget_data)
 end
 
 def invalid_number?(input)
-  no_value?(input) || input.match(/\D/)
+  no_value?(input) || !valid_number?(input)
+end
+
+def valid_number?(input)
+  input.match(/^\d*[.]\d{2}|\d*/)
 end
 
 def invalid_name?(input)
-  no_value?(input) == 0 || input.match(/\W/)
+  no_value?(input) == 0 || input.match(/[^\w\s]/)
 end
 
 def no_value?(input)
   input.nil? || input.size == 0
+end
+
+def valid_date?(date)
+  date.match(/\d{1,2}\/\d{1,2}\/(\d{2}|\d{4})/)
 end
 
 def validate_purchase
@@ -126,19 +138,19 @@ helpers do
   def total_spending_in_one_category(category)
     spending = load_yaml_file("spending.yaml")
     category_spending = spending.select { |purchase| purchase[:category] == category }
-    total = category_spending.map { |selected_purchase| selected_purchase[:amount].to_i }.inject(&:+)
-    total || 0
+    total = category_spending.map { |selected_purchase| selected_purchase[:amount].to_f.round(2) }.inject(&:+)
+    total || 0.00
   end
 
   def total_money_budgeted
     budget = load_yaml_file("budget.yaml")
 
-    budget[:categories].map { |_, amount| amount.to_i }.inject(&:+) || 0
+    budget[:categories].map { |_, amount| amount.to_f.round(2) }.inject(&:+) || 0.00
   end
 
   def money_available_to_budget
     budget_file = load_yaml_file("budget.yaml")
-    budget_file[:monthly_income].to_i - total_money_budgeted || 0
+    budget_file[:monthly_income].to_f.round(2) - total_money_budgeted || 0
   end
 
   def over_budget?
@@ -152,6 +164,10 @@ helpers do
 
   def categories_exist?(budget)
     budget[:categories].keys.size > 0
+  end
+
+  def display_as_money(number)
+    sprintf("%.2f", number)
   end
 end
 
@@ -190,7 +206,7 @@ post "/users/signout" do
   redirect "/"
 end
 
-get "/add_spending" do
+get "/add_purchase" do
   require_signed_in_user
 
   @budget = load_yaml_file("budget.yaml") 
@@ -203,7 +219,7 @@ post "/save_purchase" do
 
   purchase = { category: params[:category],
                date:     params[:date],
-               amount:   params[:amount]
+               amount:   format_money(params[:amount])
              }
 
   save_purchase(purchase)
@@ -219,11 +235,13 @@ end
 post "/budget/edit_income" do 
   monthly_income = params[:income].strip
 
+
   if invalid_number?(monthly_income)
     session[:message] = "Invalid number!"
     status 422
     redirect "/budget/edit_income"
   else
+    format_money(monthly_income)
     save_income(monthly_income)
     
     session[:message] = "Income successfully recorded."
@@ -251,6 +269,7 @@ post "/budget/add_category" do
     session[:message] = "Invalid category name - only numbers and letters allowed!"
     erb :add_category
   else
+    format_money(amount)
     add_expense_category(category_name, amount)
     session[:message] = "#{category_name} category added to monthly expenses."
     redirect "/"
@@ -269,7 +288,7 @@ post "/budget/:category_name/update" do
   # Retain the existing category name in case only the amount is being updated
   existing_category_name = params[:category_name]
   new_category_name = params[:new_category_name]
-  new_category_amount = params[:new_amount]
+  new_category_amount = format_money(params[:new_amount])
 
   if invalid_name?(new_category_name)
     session[:message] = "Invalid category name - must be text."
@@ -326,10 +345,18 @@ end
 post "/budget/purchases/:purchase_id/update" do
   purchase_index = params[:purchase_id].to_i
 
+  if invalid_number?(params[:amount])
+    session[:message] = "Invalid number!"
+    status 422
+    redirect "/budget/purchases/#{purchase_index}/edit"
+  end
+
   purchase = { category: params[:category],
                date:     params[:date],
-               amount:   params[:amount]
+               amount:   format_money(params[:amount])
               }
+
+
 
   update_purchase(purchase, purchase_index)
   session[:message] = "Purchase successfully updated."
