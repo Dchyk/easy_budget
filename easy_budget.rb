@@ -67,6 +67,16 @@ def update_purchase(purchase, index)
     end
 end
 
+def delete_purchase(index)
+  purchases = load_yaml_file("spending.yaml")
+
+  purchases.delete_at(index)
+
+  File.open(get_yaml_path("spending.yaml"), "w") do |file|
+      file.write(purchases.to_yaml)
+    end
+end
+
 def save_income(income)
   budget_file = load_yaml_file("budget.yaml")
   budget_file[:monthly_income] = income
@@ -129,6 +139,10 @@ helpers do
   def money_available_to_budget
     budget_file = load_yaml_file("budget.yaml")
     budget_file[:monthly_income].to_i - total_money_budgeted || 0
+  end
+
+  def over_budget?
+    total_money_budgeted > money_available_to_budget
   end
 
   def todays_date
@@ -319,5 +333,13 @@ post "/budget/purchases/:purchase_id/update" do
 
   update_purchase(purchase, purchase_index)
   session[:message] = "Purchase successfully updated."
+  redirect "/"
+end
+
+post "/budget/purchases/:purchase_id/delete" do
+  purchase_index = params[:purchase_id].to_i
+
+  delete_purchase(purchase_index)
+  session[:message] = "Purchase successfully deleted."
   redirect "/"
 end
