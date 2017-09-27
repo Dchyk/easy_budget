@@ -122,8 +122,30 @@ def no_value?(input)
   input.nil? || input.size == 0
 end
 
+def yyyy_mm_dd_formatted(date)
+  date.match(/\d{4}\-\d{2}-\d{2}/)
+end
+
+def return_correct_date_format(date)
+  dates = date.split("-")
+  dates[1] + "/" + dates[2] + "/" + dates[0]
+end
+
 def valid_date?(date)
-  date.match(/\d{1,2}\/\d{1,2}\/(\d{2}|\d{4})/)
+
+  date.match(/\d{1,2}\/\d{1,2}\/(\d{2}|\d{4})\b/)
+end
+
+def return_formatted_date(date)
+  if yyyy_mm_dd_formatted(date)
+    date = return_correct_date_format
+  end
+
+  unless valid_date?(date)
+    return todays_date
+  end
+
+  date
 end
 
 def validate_purchase
@@ -142,6 +164,12 @@ helpers do
     total || 0.00
   end
 
+  def total_spending_in_all_categories
+    spending = load_yaml_file("spending.yaml")
+    total_spending = spending.map { |purchase| purchase[:amount].to_f.round(2) }.inject(&:+)
+    total_spending || 0.00
+  end
+
   def total_money_budgeted
     budget = load_yaml_file("budget.yaml")
 
@@ -155,6 +183,10 @@ helpers do
 
   def over_budget?
     total_money_budgeted > money_available_to_budget
+  end
+
+  def over_total_budget?
+    total_spending_in_all_categories > money_available_to_budget
   end
 
   def todays_date
@@ -215,10 +247,10 @@ get "/add_purchase" do
 end
 
 post "/save_purchase" do
-  #validate_purchase
+  date = return_formatted_date(params[:date])
 
   purchase = { category: params[:category],
-               date:     params[:date],
+               date:     date,
                amount:   format_money(params[:amount])
              }
 
@@ -351,8 +383,10 @@ post "/budget/purchases/:purchase_id/update" do
     redirect "/budget/purchases/#{purchase_index}/edit"
   end
 
+  date = return_formatted_date(params[:date])
+
   purchase = { category: params[:category],
-               date:     params[:date],
+               date:     date,
                amount:   format_money(params[:amount])
               }
 

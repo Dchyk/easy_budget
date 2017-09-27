@@ -3,14 +3,6 @@ body {
   font-family: sans-serif;
 }
 
-ul.files {
-  list-style-image: url('../file-25.gif');
-}
-
-ul.images {
-  list-style-image: url('../image-25.gif');
-}
-
 button.edit {
   background: #EAFCFF;
   border-radius: 8px;
@@ -27,7 +19,7 @@ button.delete {
   text-decoration: none;
 }
 
-button.duplicate {
+button.add {
   background: #A7F9B3;
   border-radius: 8px;
   padding: 8px 8px;
@@ -41,6 +33,11 @@ button.duplicate {
   background: #AFF5FF;
 }
 
+.purchase {
+  padding: 10px;
+  margin-bottom: 2px;
+  background: #ccd9ff;
+}
 .image {
   padding: 10px;
   margin-bottom: 2px;
@@ -50,6 +47,11 @@ button.duplicate {
 .message {
   padding: 10px;
   background: #FFFF99;
+}
+
+.warning {
+  padding: 10px;
+  background: #ff9e9e;
 }
 
 form.inline {

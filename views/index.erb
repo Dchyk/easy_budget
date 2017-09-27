@@ -1,14 +1,14 @@
-<h1>Welcome to easy budget!</h1>
+<h1>Welcome to Easy Budget!</h1>
   <% if @budget %>
     
-    <h2>Here's a breakdown of your monthly budget:</h2>
+    <p>Here's a breakdown of your monthly budget:</p>
     
-    <p>Monthly Income: $<%= display_as_money(@budget[:monthly_income]) %>
+    <h2>Monthly Income: $<%= display_as_money(@budget[:monthly_income]) %>
       <form class="inline" action="/budget/edit_income" method="get">
-        <button type="submit">Edit Income</button>
+        <button class="edit" type="submit">Edit Income</button>
       </form>
-    </p>
-    <p>Monthly Expense Categories:</p>
+    </h2>
+    <h2>Monthly Expense Categories:</h2>
 
     <% if @budget[:categories].nil? %>
       <p>You haven't added any categories yet!</p>
@@ -17,46 +17,56 @@
       <ul>
         <% @budget[:categories].each do |category, amount| %>
           <li class="expense-category">
-            <%= category %>: $<%= display_as_money(amount) %>
+            <%= category %>: $<strong><%= display_as_money(amount) %></strong>
             <form class="inline" action="/budget/<%= category %>/edit" method="get">
-              <button type="submit">Edit</button>
+              <button class="edit" type="submit">Edit</button>
             </form>
             <% if @budget[:categories].size > 1 %>
             <form class="inline" action="/budget/<%= category %>/delete" method="post">
-              <button type="submit">Delete</button>
+              <button class="delete" type="submit">Delete</button>
             </form>
             <% end %>
           </li>
         <% end %>
       </ul>
 
-      <p>Total Budgeted Money: $<%= display_as_money(total_money_budgeted) %> / <%= display_as_money(@budget[:monthly_income]) %></p>
+      <form action="/budget/add_category" method="get">
+        <button class="edit" type="submit">Add Category</button>
+      </form>
+
+      <h3>Total Categorized Expenses: $<strong><%= display_as_money(total_money_budgeted) %></strong> / <%= display_as_money(@budget[:monthly_income]) %></h3>
       <% if over_budget? %>
         <p class="warning">WARNING: Your expenses currently exceed your monthly income!</p>
       <% end %>
 
       <% end %>
 
-      <form action="/budget/add_category" method="get">
-        <button type="submit">Add Category</button>
-      </form>
-
       <% if @purchases.nil? %>
-        <p>You haven't added any purchases yet!</p>
+        <h2>You haven't added any purchases yet!</h2>
       <% else %>
 
-      <p>Total spending this month by category:</p>
+      <h2>Total spending this month:</h2>
+      <ul>
+        <li class="expense-category">
+        $<strong><%= display_as_money(total_spending_in_all_categories) %></strong> / <%= display_as_money(@budget[:monthly_income]) %>
+        </li>
+      </ul>
+
+      <% if over_total_budget? %>
+        <p class="warning">WARNING: You've already spent more money this month than you're bringing in!</p>
+      <% end %>
+
+      <h2>Total spending this month by category:</h2>
 
       <ul>
         <% @budget[:categories].each do |category, _| %>
           <li class="expense-category">
-            <%= category %>: $<%= display_as_money(total_spending_in_one_category(category)) %> / <%= display_as_money(@budget[:categories][category]) %>
+            <%= category %>: $<strong><%= display_as_money(total_spending_in_one_category(category)) %></strong> / <%= display_as_money(@budget[:categories][category]) %>
           </li>
         <% end %>
-
       </ul>
 
-      
+ 
 
     <% end %>
 
@@ -65,7 +75,7 @@
   <% end %>
 
 
-<h2>Recent Spending:</h2>
+<h2>All Recent Spending:</h2>
 
   <% if @purchases.nil? %>
     <p>You haven't added any purchases yet!</p>
@@ -74,13 +84,13 @@
   <ul>
     <% @purchases.each_with_index do |purchase, index| %>
       <li class="purchase">
-        $<%= display_as_money(purchase[:amount]) %> in the <%= purchase[:category] %> category on <%= purchase[:date] %>
+        $<strong><%= display_as_money(purchase[:amount]) %></strong> in the <%= purchase[:category] %> category on <%= purchase[:date] %>
         <form class="inline" action="/budget/purchases/<%= index %>/edit" method="get">
-           <button type="submit">Edit</button>
+           <button class= "edit" type="submit">Edit</button>
         </form>
         
           <form class="inline" action="/budget/purchases/<%= index %>/delete" method="post">
-             <button type="submit">Delete</button>
+             <button class="delete" type="submit">Delete</button>
           </form>
         
       </li>
@@ -91,7 +101,7 @@
 
 <% if @budget[:categories].size > 0 %>
   <form action="/add_purchase" method="get">
-    <button type="submit">Add Purchase</button>
+    <button class="edit" type="submit">Add Purchase</button>
   </form>
 <% else %>
   <p>Please add some categories, and then you can submit purchases to track your budget!</p>
@@ -100,7 +110,7 @@
 <% if session[:username] %>
   <p class="user-status">Signed in as <%= session[:username] %>
   <form action="/users/signout" method="post">
-    <button type="submit">Sign Out</button>
+    <button class="edit" type="submit">Sign Out</button>
   </form>
 <% else %>
   <form action="/users/signin" method="get">
