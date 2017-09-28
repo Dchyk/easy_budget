@@ -1,13 +1,18 @@
-<h1>** Easy Budget ** </h1>
-<h2 class="version">v1.0</h2>
-
+<header>
+  <h1>** Easy Budget ** </h1>
+  <h2 class="version">v1.0</h2>
+</header>
   
     
-<h2>Monthly Income: $<%= display_as_money(@budget[:monthly_income]) %>
-  <form class="inline" action="/budget/edit_income" method="get">
-    <button class="edit" type="submit">Edit Income</button>
-  </form>
-</h2>
+<h2>Monthly Income:</h2>
+<ul>
+  <li class="expense-category">
+  $<strong><%= display_as_money(@budget[:monthly_income]) %></strong>
+    <form class="inline" action="/budget/edit_income" method="get">
+      <button class="edit" type="submit">Edit Income</button>
+    </form>
+  </li>
+</ul>
 <h2>Monthly Expense Categories:</h2>
 
 <% if @budget[:categories].nil? %>
@@ -22,7 +27,7 @@
           <button class="edit" type="submit">Edit</button>
         </form>
         <% if @budget[:categories].size > 1 %>
-        <form class="inline" action="/budget/<%= category %>/delete" method="post">
+        <form class="inline delete" action="/budget/<%= category %>/delete" method="post">
           <button class="delete" type="submit">Delete</button>
         </form>
         <% end %>
@@ -34,7 +39,12 @@
     <button class="edit" type="submit">Add Category</button>
   </form>
 
-  <h3>Total Categorized Expenses: $<strong><%= display_as_money(total_money_budgeted) %></strong> / <%= display_as_money(@budget[:monthly_income]) %></h3>
+  <h2>Total Categorized Expenses:</h2>
+    <ul>
+      <li class="expense-category">
+        $<strong><%= display_as_money(total_money_budgeted) %></strong> / <%= display_as_money(@budget[:monthly_income]) %>
+      </li>
+    </ul>
   
     <% if over_budget? %>
       <p class="warning">WARNING: Your expenses currently exceed your monthly income!</p>
@@ -58,7 +68,7 @@
 
     <ul>
       <% @budget[:categories].each do |category, _| %>
-        <li class="expense-category">
+        <li class="<%= get_category_class(category) %>">
           <%= category %>: $<strong><%= display_as_money(total_spending_in_one_category(category)) %></strong> / <%= display_as_money(@budget[:categories][category]) %>
         </li>
       <% end %>
@@ -78,7 +88,7 @@
            <button class= "edit" type="submit">Edit</button>
         </form>
         
-          <form class="inline" action="/budget/purchases/<%= index %>/delete" method="post">
+          <form class="inline delete" action="/budget/purchases/<%= index %>/delete" method="post">
              <button class="delete" type="submit">Delete</button>
           </form>
         

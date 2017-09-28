@@ -25,7 +25,7 @@ class EasyBudgetTest < Minitest::Test
     get "/", {}, admin_session
 
     assert_equal 200, last_response.status
-    assert_includes last_response.body, "Welcome to easy budget!"
+    assert_includes last_response.body, "** Easy Budget **"
     # load a testing version of spending items
     # load a testing version of budget items
   end
@@ -94,19 +94,39 @@ class EasyBudgetTest < Minitest::Test
 
     get last_response["Location"]
     assert_equal 200, last_response.status
-    assert_includes last_response.body, "Test: $130" # This line isn't working
+    assert_includes last_response.body, "Test: $"
+    assert_includes last_response.body, %q(<strong>130.00</strong>)
   end
 
   def test_add_invalid_category
-    skip
+    get "/budget/add_category", {}, admin_session
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "Add a Category of Monthly Expenses:"
+
+    post "/budget/add_category", category_name: "Parts & Labor", amount: 100
+    assert_includes last_response.body, "Invalid category name - only numbers and letters allowed!"
   end
 
-  def test_edit_and_save_income
-    skip
+  def test_add_duplicate_category
+    post "/budget/add_category", { category_name: "Test", amount: 100 }, admin_session
+    assert_includes last_response.body, "Category name already exists - please choose a unique name!"
+  end
+
+  def test_edit_income
+    get "/budget/edit_income", {}, admin_session
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "Update your monthly income"
+    assert_includes last_response.body, %q(<button class="edit")
+    assert_includes last_response.body, %q(<button class="delete")
   end
 
   def test_edit_income_invalid_input
-    skip
+    post "/budget/edit_income", { income: " "}, admin_session
+    assert_equal 302, last_response.status
+
+    get last_response["Location"]
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "Invalid number!"
   end
 
   def test_edit_category
@@ -136,4 +156,10 @@ class EasyBudgetTest < Minitest::Test
   def test_delete_purchase
     skip
   end
+
+  def test_spending_exceeds_income_warning
+    skip
+  end
+
+
 end

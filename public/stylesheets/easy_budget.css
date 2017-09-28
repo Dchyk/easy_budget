@@ -3,9 +3,11 @@ body {
   font-family: sans-serif;
 }
 
-h1.banner {
+header {
   margin: 0 auto;
   text-align: center;
+  padding: 10px;
+  background-color: #93ffab;
 }
 
 .version {
@@ -40,6 +42,12 @@ button.add {
   padding: 10px;
   margin-bottom: 2px;
   background: #AFF5FF;
+}
+
+.expense-category-warning {
+  padding: 10px;
+  margin-bottom: 2px;
+  background: #ff9e9e;
 }
 
 .purchase {

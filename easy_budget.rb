@@ -1,6 +1,6 @@
 require 'yaml'
 require 'sinatra'
-require 'sinatra/reloader'
+require 'sinatra/reloader' if development?
 require 'sinatra/content_for'
 require 'tilt/erubis'
 require 'pry'
@@ -115,7 +115,7 @@ def valid_number?(input)
 end
 
 def invalid_name?(input)
-  no_value?(input) == 0 || input.match(/[^\w\s]/)
+  no_value?(input) || input.match(/[^\w\s]/)
 end
 
 def no_value?(input)
@@ -156,6 +156,11 @@ def more_than_one_category_exists?(budget)
   budget[:categories].size > 1
 end
 
+def category_already_exists?(category_name)
+  budget = load_yaml_file("budget.yaml")
+  budget[:categories].keys.map(&:downcase).include?(category_name.downcase)
+end
+
 helpers do
   def total_spending_in_one_category(category)
     spending = load_yaml_file("spending.yaml")
@@ -173,6 +178,7 @@ helpers do
   def total_money_budgeted
     budget = load_yaml_file("budget.yaml")
 
+
     budget[:categories].map { |_, amount| amount.to_f.round(2) }.inject(&:+) || 0.00
   end
 
@@ -181,12 +187,34 @@ helpers do
     budget_file[:monthly_income].to_f.round(2) - total_money_budgeted || 0
   end
 
+  def monthly_income
+    budget = load_yaml_file("budget.yaml")
+    budget[:monthly_income].to_f.round(2)
+  end
+
   def over_budget?
-    total_money_budgeted > money_available_to_budget
+    total_money_budgeted > monthly_income
   end
 
   def over_total_budget?
     total_spending_in_all_categories > money_available_to_budget
+  end
+
+  def category_over_budget?(category)
+    # spending in category > budgeted for that category
+    spending = load_yaml_file("spending.yaml")
+    budget = load_yaml_file("budget.yaml")
+    budgeted_for_category = budget[:categories][category].to_f
+
+    total_spending_in_one_category(category) > budgeted_for_category
+  end
+
+  def get_category_class(category)
+    if category_over_budget?(category)
+      "expense-category-warning"
+    else
+      "expense-category"
+    end
   end
 
   def todays_date
@@ -199,6 +227,8 @@ helpers do
   end
 
   def display_as_money(number)
+    # Account for nil input and convert to 0
+    number = 0.00 unless number
     sprintf("%.2f", number)
   end
 end
@@ -211,8 +241,12 @@ get "/" do
   erb :index
 end
 
-get "/users/signin" do
+not_found do
+  session[:message] = "That page doesn't exist."
+  redirect "/"
+end
 
+get "/users/signin" do
   erb :signin
 end
 
@@ -243,7 +277,7 @@ get "/add_purchase" do
 
   @budget = load_yaml_file("budget.yaml") 
 
-  erb :add_spending
+  erb :add_purchase
 end
 
 post "/save_purchase" do
@@ -266,7 +300,6 @@ end
 
 post "/budget/edit_income" do 
   monthly_income = params[:income].strip
-
 
   if invalid_number?(monthly_income)
     session[:message] = "Invalid number!"
@@ -294,11 +327,14 @@ post "/budget/add_category" do
   category_name = params[:category_name].strip
   amount = params[:amount].strip
 
-  if invalid_number?(amount)
-    session[:message] = "Invalid number - please enter a positive number."
-    erb :add_category
-  elsif invalid_name?(category_name)
+  if invalid_name?(category_name)
     session[:message] = "Invalid category name - only numbers and letters allowed!"
+    erb :add_category
+  elsif category_already_exists?(category_name)
+    session[:message] = "Category name already exists - please choose a unique name!"
+    erb :add_category
+  elsif invalid_number?(amount)
+    session[:message] = "Invalid number - please enter a positive number."
     erb :add_category
   else
     format_money(amount)
@@ -344,12 +380,6 @@ post "/budget/:category_name/update" do
 end
 
 post "/budget/:category_name/delete" do
-  # Force user to have at least one active category
-  #unless more_than_one_category_exists?
-  #  session[:message] = "Can't delete category - you must have at least one category."
-  #  redirect "/"
-  #end
-
   budget = load_yaml_file("budget.yaml")
   category_name = params[:category_name]
 
@@ -362,7 +392,7 @@ post "/budget/:category_name/delete" do
   budget[:categories].delete(category_name)
   save_budget_data_to_yaml(budget)
 
-  session[:message] = "#{category_name} successfully deleted. NOTE: Update your spending data categories accordingly!"
+  session[:message] = "'#{category_name}' category successfully deleted. NOTE: Update your spending data categories accordingly!"
   redirect "/"
 end
 
@@ -389,8 +419,6 @@ post "/budget/purchases/:purchase_id/update" do
                date:     date,
                amount:   format_money(params[:amount])
               }
-
-
 
   update_purchase(purchase, purchase_index)
   session[:message] = "Purchase successfully updated."
