@@ -3,6 +3,15 @@ body {
   font-family: sans-serif;
 }
 
+h1.banner {
+  margin: 0 auto;
+  text-align: center;
+}
+
+.version {
+  font-size: 0.9em;
+}
+
 button.edit {
   background: #EAFCFF;
   border-radius: 8px;
@@ -66,4 +75,8 @@ form.inline {
 .note {
   font-style: italic;
   font-size: 0.9em;
+}
+
+.form-item {
+  padding-bottom: 10px;
 }

@@ -133,7 +133,7 @@ end
 
 def valid_date?(date)
 
-  date.match(/\d{1,2}\/\d{1,2}\/(\d{2}|\d{4})\b/)
+  date.match(/\b\d{1,2}\/\d{1,2}\/(\d{2}|\d{4})\b/)
 end
 
 def return_formatted_date(date)
@@ -362,7 +362,7 @@ post "/budget/:category_name/delete" do
   budget[:categories].delete(category_name)
   save_budget_data_to_yaml(budget)
 
-  session[:message] = "#{category_name} successfully deleted."
+  session[:message] = "#{category_name} successfully deleted. NOTE: Update your spending data categories accordingly!"
   redirect "/"
 end
 

@@ -1,20 +1,25 @@
 <h1>Add a Category of Monthly Expenses:</h1>
 
-<form action="/budget/add_category" method="post">
+<form class="inline" action="/budget/add_category" method="post">
   
     <label for="category_name">Category Name:</label>
 
-    <div>
+    <div class="form-item">
     <input name="category_name" id="category_name" value="Ex. Gas, Groceries, etc">
     </div>
 
     <label for="amount">Amount to budget:</label>
 
-    <div>
+    <div class="form-item">
     $<input type="number" min="0.00" max="100000.00" step="0.01" name="amount" id="amount" value="$0">
     </div>
 
-    <button type="submit">Save</button>
+    <button class="edit" type="submit">Save</button>
+</form>
+<form class="inline" action="/" method="get">
+    <button class="delete" type="submit">Cancel</button>
 </form>
 
-<h2>Total money budgeted so far: <%= total_money_budgeted %> / Available to budget: <%= money_available_to_budget %></h2>
+
+<h2>Total money budgeted so far: $<%= display_as_money(total_money_budgeted) %> <br/> Available to budget: $<%= display_as_money(money_available_to_budget) %></h2>
+

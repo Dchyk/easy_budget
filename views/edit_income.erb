@@ -1,12 +1,16 @@
 <h1>Update your monthly income</h1>
 
-<form action="/budget/edit_income" method="post">
+<form class="inline" action="/budget/edit_income" method="post">
   
     <label for="income">Income:</label>
 
-    <div>
+    <div class="form-item">
     $<input type="number" name="income" id="income" value="<%= @budget[:monthly_income] %>">
     </div>
 
-    <button type="submit">Save</button>
+    <button class="edit" type="submit">Save</button>
+</form>
+
+<form class="inline" action="/" method="get">
+  <button class="delete" type="submit">Cancel</button>
 </form>

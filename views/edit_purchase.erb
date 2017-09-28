@@ -1,16 +1,17 @@
 <h1>Edit Purchase:</h1>
 
-<form action="/budget/purchases/<%= params[:purchase_id] %>/update" method="post">
+<form class="inline" action="/budget/purchases/<%= params[:purchase_id] %>/update" method="post">
   
-    <label for="date">Date:</label>
+    <label for="date">Date (Month/Day/Year)*</label>
 
-    <div>
+    <div class="form-item">
     <input type="date" name="date" id="date" value="<%= @purchase[:date] %>">
     </div>
+    <p class="note">*Invalid date input will be automatically set to today's date</p>
 
     <label for="category">Category:</label>
 
-    <div>
+    <div class="form-item">
       <select name="category" id="category">
         <% @budget[:categories].each do |category_name, _| %>
           <option value="<%= category_name %>"><%= category_name %></option>
@@ -20,11 +21,13 @@
 
     <label for="amount">Amount:</label>
 
-    <div> <!-- Forces the user to input a number -->
-    <input type="number" min="0.00" max="100000.00" step="0.01" name="amount" id="amount" value="<%= @purchase[:amount] %>">
+    <div class="form-item"> <!-- Forces the user to input a number -->
+    $<input type="number" min="0.00" max="100000.00" step="0.01" name="amount" id="amount" value="<%= @purchase[:amount] %>">
     </div>
 
     <button class="edit" type="submit">Save Purchase</button>
 </form>
 
-<a href="/">Cancel</a>
+<form class="inline" action="/" method="get">
+  <button class="delete" type="submit">Cancel</button>
+</form>
