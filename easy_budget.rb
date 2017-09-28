@@ -281,6 +281,8 @@ get "/add_purchase" do
 end
 
 post "/save_purchase" do
+  require_signed_in_user
+  
   date = return_formatted_date(params[:date])
 
   purchase = { category: params[:category],
@@ -294,11 +296,14 @@ post "/save_purchase" do
 end
 
 get "/budget/edit_income" do
+  require_signed_in_user
   @budget = load_yaml_file("budget.yaml")
   erb :edit_income
 end
 
-post "/budget/edit_income" do 
+post "/budget/edit_income" do
+  require_signed_in_user 
+
   monthly_income = params[:income].strip
 
   if invalid_number?(monthly_income)
@@ -314,16 +319,14 @@ post "/budget/edit_income" do
   end
 end
 
-get "/budget/edit_income" do
-  @budget = load_yaml_file("budget.yaml")
-  erb :edit_income
-end
-
 get "/budget/add_category" do
+  require_signed_in_user
   erb :add_category
 end
 
 post "/budget/add_category" do
+  require_signed_in_user
+
   category_name = params[:category_name].strip
   amount = params[:amount].strip
 
@@ -345,6 +348,8 @@ post "/budget/add_category" do
 end
 
 get "/budget/:category_name/edit" do
+  require_signed_in_user
+
   @budget = load_yaml_file("budget.yaml")
 
   @category_name = params[:category_name]
@@ -353,6 +358,8 @@ get "/budget/:category_name/edit" do
 end
 
 post "/budget/:category_name/update" do
+  require_signed_in_user
+
   # Retain the existing category name in case only the amount is being updated
   existing_category_name = params[:category_name]
   new_category_name = params[:new_category_name]
@@ -380,6 +387,8 @@ post "/budget/:category_name/update" do
 end
 
 post "/budget/:category_name/delete" do
+  require_signed_in_user
+
   budget = load_yaml_file("budget.yaml")
   category_name = params[:category_name]
 
@@ -397,6 +406,8 @@ post "/budget/:category_name/delete" do
 end
 
 get "/budget/purchases/:purchase_id/edit" do
+  require_signed_in_user
+
   purchases = load_yaml_file("spending.yaml")
   purchase_index = params[:purchase_id].to_i
   @purchase = purchases[purchase_index]
@@ -405,6 +416,8 @@ get "/budget/purchases/:purchase_id/edit" do
 end
 
 post "/budget/purchases/:purchase_id/update" do
+  require_signed_in_user
+
   purchase_index = params[:purchase_id].to_i
 
   if invalid_number?(params[:amount])
@@ -426,9 +439,15 @@ post "/budget/purchases/:purchase_id/update" do
 end
 
 post "/budget/purchases/:purchase_id/delete" do
+  require_signed_in_user
+
   purchase_index = params[:purchase_id].to_i
 
   delete_purchase(purchase_index)
   session[:message] = "Purchase successfully deleted."
   redirect "/"
+end
+
+post "/budget/purchases/reset_all" do
+
 end
