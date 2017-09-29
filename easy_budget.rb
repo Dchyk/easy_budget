@@ -1,9 +1,7 @@
 require 'yaml'
 require 'sinatra'
 require 'sinatra/reloader' if development?
-require 'sinatra/content_for'
 require 'tilt/erubis'
-require 'pry'
 
 configure do
   enable :sessions
@@ -148,10 +146,6 @@ def return_formatted_date(date)
   date
 end
 
-def validate_purchase
-  # needed
-end
-
 def more_than_one_category_exists?(budget)
   budget[:categories].size > 1
 end
@@ -282,7 +276,7 @@ end
 
 post "/save_purchase" do
   require_signed_in_user
-  
+
   date = return_formatted_date(params[:date])
 
   purchase = { category: params[:category],
@@ -448,6 +442,14 @@ post "/budget/purchases/:purchase_id/delete" do
   redirect "/"
 end
 
-post "/budget/purchases/reset_all" do
+post "/budget/purchases/delete_all" do
+  require_signed_in_user
 
+  purchases = []
+  File.open(get_yaml_path("spending.yaml"), "w") do |file|
+      file.write(purchases.to_yaml)
+    end
+
+  session[:message] = "All purchases have been successfully deleted. You're ready to start a fresh month!"
+  redirect "/"
 end

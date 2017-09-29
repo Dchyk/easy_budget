@@ -99,9 +99,14 @@
     <% end %>
 
 <% if @budget[:categories].size > 0 %>
-  <form action="/add_purchase" method="get">
+  <form class="inline" action="/add_purchase" method="get">
     <button class="edit" type="submit">Add Purchase</button>
   </form>
+  <% unless @purchases.empty? %>
+    <form class="inline delete" action="/budget/purchases/delete_all" method="post">
+      <button class="delete" type="submit">Reset All Purchases</button>
+    </form>
+  <% end %>
 <% else %>
   <p>Please add some categories, and then you can submit purchases to track your budget!</p>
 <% end %>

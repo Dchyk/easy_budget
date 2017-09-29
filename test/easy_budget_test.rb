@@ -157,9 +157,14 @@ class EasyBudgetTest < Minitest::Test
     skip
   end
 
+  def test_delete_all_purchases
+    skip
+  end
+
   def test_spending_exceeds_income_warning
     skip
   end
+
 
 
 end
