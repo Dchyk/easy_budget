@@ -244,11 +244,10 @@ end
 get "/" do
   require_signin
 
-  @budget = load_yaml_file("budget.yaml")
   @income = @storage.get_monthly_income
   @purchases = @storage.get_all_purchases
   @categories = @storage.get_all_categories
-  # @purchases = load_yaml_file("spending.yaml")
+
   erb :index
 end
 
@@ -352,23 +351,22 @@ post "/budget/add_category" do
     erb :add_category
   else
     format_money(amount)
-    add_expense_category(category_name, amount)
+    @storage.add_expense_category(category_name, amount)
     session[:message] = "#{category_name} category added to monthly expenses."
     redirect "/"
   end
 end
 
-get "/budget/:category_name/edit" do
+get "/budget/:category_id/edit" do
   require_signed_in_user
 
-  @budget = load_yaml_file("budget.yaml")
-
-  @category_name = params[:category_name]
+  @category = @storage.get_all_categories.select { |tuple| tuple[:id] == params[:category_id] }.first
+  puts @category
 
   erb :edit_category
 end
 
-post "/budget/:category_name/update" do
+post "/budget/:category_id/update" do
   require_signed_in_user
 
   # Retain the existing category name in case only the amount is being updated
@@ -376,43 +374,29 @@ post "/budget/:category_name/update" do
   new_category_name = params[:new_category_name]
   new_category_amount = format_money(params[:new_amount])
 
+
   if invalid_name?(new_category_name)
     session[:message] = "Invalid category name - must be text."
-    redirect "/budget/#{existing_category_name}/edit"
+    redirect "/budget/#{params[:category_id]}/edit"
   end
 
-  budget = load_yaml_file("budget.yaml")
-
-  if new_category_name == existing_category_name
-    budget[:categories][existing_category_name] = new_category_amount
-    session[:message] = "#{existing_category_name} successfully updated!"
-  else
-    budget[:categories].delete(existing_category_name)
-    budget[:categories][new_category_name] = new_category_amount
-    session[:message] = "#{new_category_name} successfully updated!"
-  end
-
-  save_budget_data_to_yaml(budget)
-
+  @storage.update_category(new_category_name, new_category_amount, params[:category_id])
+  session[:message] = "#{new_category_name} category successfully updated!"
   redirect "/"
 end
 
-post "/budget/:category_name/delete" do
+post "/budget/:category_id/delete" do
   require_signed_in_user
 
-  budget = load_yaml_file("budget.yaml")
-  category_name = params[:category_name]
-
   # Prevent user-generated URLs to delete files
-  unless budget[:categories].include?(category_name)
-    session[:message] = "Can't delete - that category doesn't exist!"
-    redirect "/"
-  end
+  #unless budget[:categories].include?(category_name)
+  #  session[:message] = "Can't delete - that category doesn't exist!"
+  #  redirect "/"
+  #end
 
-  budget[:categories].delete(category_name)
-  save_budget_data_to_yaml(budget)
+  @storage.delete_category(params[:category_id])
 
-  session[:message] = "'#{category_name}' category successfully deleted. NOTE: Update your spending data categories accordingly!"
+  session[:message] = "Category deleted."
   redirect "/"
 end
 

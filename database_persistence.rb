@@ -15,7 +15,7 @@ class DatabasePersistence
   end
 
   def query(statement, *params)
-    @logger.info "#{statement}: #{params}"
+    #@logger.info "#{statement}: #{params}"
     @db.exec_params(statement, params)
   end
 
@@ -58,7 +58,7 @@ class DatabasePersistence
     end
   end
 
-  def save_category(category_name, amount)
+  def add_expense_category(category_name, amount)
     sql = ("INSERT INTO categories (name, amount) VALUES ($1, $2)")
     query(sql, category_name, amount)
   end
@@ -69,6 +69,11 @@ class DatabasePersistence
   end
 
   def delete_category(category_id)
+    # Reset any existing purchases of this category to Miscellaneous
+    sql = ("UPDATE purchases SET category_id = 1 WHERE category_id = $1")
+    query(sql, category_id)
+
+    # Then delete the category
     sql = ("DELETE FROM categories WHERE id = $1")
     query(sql, category_id)
   end
