@@ -1,11 +1,17 @@
 require 'yaml'
 require 'sinatra'
-require 'sinatra/reloader' if development?
 require 'tilt/erubis'
+
+require_relative 'database_persistence'
 
 configure do
   enable :sessions
   set :session_secret, 'secret'
+end
+
+configure(:development) do
+  require "sinatra/reloader"
+  also_reload "database_persistence.rb"
 end
 
 def require_signed_in_user
@@ -227,11 +233,22 @@ helpers do
   end
 end
 
+before do
+  @storage = DatabasePersistence.new(logger)
+end
+
+after do
+  @storage.disconnect
+end
+
 get "/" do
   require_signin
 
   @budget = load_yaml_file("budget.yaml")
-  @purchases = load_yaml_file("spending.yaml")
+  @income = @storage.get_monthly_income
+  @purchases = @storage.get_all_purchases
+  @categories = @storage.get_all_categories
+  # @purchases = load_yaml_file("spending.yaml")
   erb :index
 end
 
@@ -291,7 +308,7 @@ end
 
 get "/budget/edit_income" do
   require_signed_in_user
-  @budget = load_yaml_file("budget.yaml")
+  @income = @storage.get_monthly_income
   erb :edit_income
 end
 
@@ -305,8 +322,8 @@ post "/budget/edit_income" do
     status 422
     redirect "/budget/edit_income"
   else
-    format_money(monthly_income)
-    save_income(monthly_income)
+    #format_money(monthly_income)
+    @storage.update_monthly_income(monthly_income)
     
     session[:message] = "Income successfully recorded."
     redirect "/"
