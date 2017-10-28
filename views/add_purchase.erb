@@ -12,9 +12,9 @@
     <label for="category">Category:</label>
 
     <div class="form-item">
-      <select name="category" id="category">
-        <% @budget[:categories].each do |category_name, _| %>
-          <option value="<%= category_name %>"><%= category_name %></option>
+      <select name="category_id" id="category_id">
+        <% @categories.each do |tuple| %>
+          <option value="<%= tuple[:id] %>"><%= tuple[:name] %></option>
         <% end %>
       </select>
     </div>

@@ -15,25 +15,28 @@
 </ul>
 <h2>Monthly Expense Categories:</h2>
 
-<% if @categories.nil? %>
+<% if @categories.size <= 1 %>
   <p>You haven't added any categories yet!</p>
 <% else %>
 
   <ul>
-    <% @categories.each do |category| %>
+    <% @categories[1..-1].each do |category| %>
       <li class="expense-category">
         <%= category[:name] %>: $<strong><%= category[:amount] %></strong>
-        <form class="inline" action="/budget/<%= category[:id] %>/edit" method="get">
-          <button class="edit" type="submit">Edit</button>
-        </form>
-        <% if @categories.size > 1 %>
-        <form class="inline delete" action="/budget/<%= category[:id] %>/delete" method="post">
-          <button class="delete" type="submit">Delete</button>
-        </form>
+        <% if category[:id] != "1" %>
+          <form class="inline" action="/budget/<%= category[:id] %>/edit" method="get">
+            <button class="edit" type="submit">Edit</button>
+          </form>
+          <form class="inline delete" action="/budget/<%= category[:id] %>/delete" method="post">
+            <button class="delete" type="submit">Delete</button>
+          </form>
         <% end %>
       </li>
     <% end %>
   </ul>
+
+
+<% end %>
 
   <form action="/budget/add_category" method="get">
     <button class="edit" type="submit">Add Category</button>
@@ -50,26 +53,27 @@
       <p class="warning">WARNING: Your expenses currently exceed your monthly income!</p>
     <% end %>
 
-  <% end %>
+  
 
   <h2>Total spending this month:</h2>
 
     <ul>
       <li class="expense-category">
-      $<strong><%= display_as_money(total_spending_in_all_categories) %></strong> / <%= @income %>
+      $<strong><%= display_as_money(total_spending_in_all_categories(@purchases)) %></strong> / <%= @income %>
       </li>
     </ul>
 
-    <% if over_total_budget? %>
+    <!--  if over_total_budget? 
       <p class="warning">WARNING: You've already spent more money this month than you're bringing in!</p>
-    <% end %>
+     end  -->
 
     <h2>Total spending this month by category:</h2>
 
     <ul>
       <% @categories.each do |category| %>
-        <li class="<%= get_category_class(category) %>">
-          <%= category[:name] %>: $<strong><%= display_as_money(total_spending_in_one_category(category)) %></strong> / <%= display_as_money(category[:amount]) %>
+      <!-- REPLACE BELOW WITH <li class="RUBY get_category_class(category) RUBY"> -->
+        <li class="expense-category">
+          <%= category[:name] %>: $<strong><%= total_spending_in_one_category(@purchases, category[:name]) %></strong> / <%= display_as_money(category[:amount]) %>
         </li>
       <% end %>
     </ul>

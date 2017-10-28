@@ -85,7 +85,7 @@ class DatabasePersistence
 
   def get_single_purchase(purchase_id)
     sql = ("SELECT * FROM purchases WHERE id = $1")
-    query(sql, purchase_id)
+    query(sql, purchase_id).first
   end
 
   def save_purchase(category_id, date, amount)
@@ -93,9 +93,9 @@ class DatabasePersistence
     query(sql, category_id, date, amount)
   end
 
-  def update_single_purchase(category, amount, purchase_id)
-    sql = ("UPDATE purchases SET category = $1, amount = $2 WHERE id = $3")
-    query(sql, category, amount, purchase_id)
+  def update_single_purchase(category_id, amount, date, purchase_id)
+    sql = ("UPDATE purchases SET category_id = $1, amount = $2, date = $3 WHERE id = $4")
+    query(sql, category_id, amount, date, purchase_id)
   end
 
   def delete_purchase(purchase_id)
@@ -103,5 +103,7 @@ class DatabasePersistence
     query(sql, purchase_id)
   end
 
-  
+  def delete_all_purchases
+    query("DELETE FROM purchases")
+  end
 end

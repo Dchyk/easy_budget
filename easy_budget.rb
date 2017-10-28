@@ -162,18 +162,14 @@ def category_already_exists?(category_name)
 end
 
 helpers do
-  def total_spending_in_one_category(category)
-    spending = load_yaml_file("spending.yaml")
-    category_spending = spending.select { |purchase| purchase[:category] == category }
-    total = category_spending.map { |selected_purchase| selected_purchase[:amount].to_f.round(2) }.inject(&:+)
-    total || 0.00
+  def total_spending_in_one_category(purchases, category_name)
+    category_purchases = purchases.select { |purchase| purchase[:category] == category_name }
+    category_purchases.map { |purchase| purchase[:amount].to_f }.inject(&:+) || 0
   end
 
-  def total_spending_in_all_categories
-    spending = load_yaml_file("spending.yaml")
-    total_spending = spending.map { |purchase| purchase[:amount].to_f.round(2) }.inject(&:+)
-    total_spending || 0.00
-  end
+  # def total_spending_in_all_categories(purchases)
+  #   purchases.map { |purchase| purchase[:amount].to_f }.inject(&:+)
+  # end
 
   def total_money_budgeted
     budget = load_yaml_file("budget.yaml")
@@ -192,30 +188,30 @@ helpers do
     budget[:monthly_income].to_f.round(2)
   end
 
-  def over_budget?
-    total_money_budgeted > monthly_income
-  end
+  #def over_budget?
+  #  total_money_budgeted > monthly_income
+  #end
 
-  def over_total_budget?
-    total_spending_in_all_categories > money_available_to_budget
-  end
+  #def over_total_budget?
+  #  total_spending_in_all_categories > money_available_to_budget
+  #end
 
-  def category_over_budget?(category)
-    # spending in category > budgeted for that category
-    spending = load_yaml_file("spending.yaml")
-    budget = load_yaml_file("budget.yaml")
-    budgeted_for_category = budget[:categories][category].to_f
+  #def category_over_budget?(category)
+  #  spending in category > budgeted for that category
+  #  spending = load_yaml_file("spending.yaml")
+  #  budget = load_yaml_file("budget.yaml")
+  #  budgeted_for_category = budget[:categories][category].to_f
 
-    total_spending_in_one_category(category) > budgeted_for_category
-  end
+  #  total_spending_in_one_category(purchases, category) > budgeted_for_category
+  #end
 
-  def get_category_class(category)
-    if category_over_budget?(category)
-      "expense-category-warning"
-    else
-      "expense-category"
-    end
-  end
+  # def get_category_class(category)
+  #   if category_over_budget?(category)
+  #     "expense-category-warning"
+  #   else
+  #     "expense-category"
+  #   end
+  # end
 
   def todays_date
     date = Time.now
@@ -282,29 +278,6 @@ post "/users/signout" do
   redirect "/"
 end
 
-get "/add_purchase" do
-  require_signed_in_user
-
-  @budget = load_yaml_file("budget.yaml") 
-
-  erb :add_purchase
-end
-
-post "/save_purchase" do
-  require_signed_in_user
-
-  date = return_formatted_date(params[:date])
-
-  purchase = { category: params[:category],
-               date:     date,
-               amount:   format_money(params[:amount])
-             }
-
-  save_purchase(purchase)
-  session[:message] = "Purchase successfully recorded."
-  redirect "/"
-end
-
 get "/budget/edit_income" do
   require_signed_in_user
   @income = @storage.get_monthly_income
@@ -321,9 +294,7 @@ post "/budget/edit_income" do
     status 422
     redirect "/budget/edit_income"
   else
-    #format_money(monthly_income)
     @storage.update_monthly_income(monthly_income)
-    
     session[:message] = "Income successfully recorded."
     redirect "/"
   end
@@ -350,7 +321,6 @@ post "/budget/add_category" do
     session[:message] = "Invalid number - please enter a positive number."
     erb :add_category
   else
-    format_money(amount)
     @storage.add_expense_category(category_name, amount)
     session[:message] = "#{category_name} category added to monthly expenses."
     redirect "/"
@@ -361,7 +331,6 @@ get "/budget/:category_id/edit" do
   require_signed_in_user
 
   @category = @storage.get_all_categories.select { |tuple| tuple[:id] == params[:category_id] }.first
-  puts @category
 
   erb :edit_category
 end
@@ -369,11 +338,9 @@ end
 post "/budget/:category_id/update" do
   require_signed_in_user
 
-  # Retain the existing category name in case only the amount is being updated
   existing_category_name = params[:category_name]
   new_category_name = params[:new_category_name]
   new_category_amount = format_money(params[:new_amount])
-
 
   if invalid_name?(new_category_name)
     session[:message] = "Invalid category name - must be text."
@@ -400,20 +367,36 @@ post "/budget/:category_id/delete" do
   redirect "/"
 end
 
+get "/add_purchase" do
+  require_signed_in_user
+
+  @categories = @storage.get_all_categories 
+
+  erb :add_purchase
+end
+
+post "/save_purchase" do
+  require_signed_in_user
+
+  date = return_formatted_date(params[:date])
+
+  @storage.save_purchase(params[:category_id], date, params[:amount])
+
+  session[:message] = "Purchase successfully recorded."
+  redirect "/"
+end
+
 get "/budget/purchases/:purchase_id/edit" do
   require_signed_in_user
 
-  purchases = load_yaml_file("spending.yaml")
-  purchase_index = params[:purchase_id].to_i
-  @purchase = purchases[purchase_index]
-  @budget = load_yaml_file("budget.yaml")
+  @purchase = @storage.get_single_purchase(params[:purchase_id])
+  @categories = @storage.get_all_categories
+
   erb :edit_purchase
 end
 
 post "/budget/purchases/:purchase_id/update" do
   require_signed_in_user
-
-  purchase_index = params[:purchase_id].to_i
 
   if invalid_number?(params[:amount])
     session[:message] = "Invalid number!"
@@ -421,14 +404,13 @@ post "/budget/purchases/:purchase_id/update" do
     redirect "/budget/purchases/#{purchase_index}/edit"
   end
 
-  date = return_formatted_date(params[:date])
+  category_id = params[:category_id]
+  amount = params[:amount]
+  date = params[:date]
+  purchase_id = params[:purchase_id]
 
-  purchase = { category: params[:category],
-               date:     date,
-               amount:   format_money(params[:amount])
-              }
+  @storage.update_single_purchase(category_id, amount, date, purchase_id)
 
-  update_purchase(purchase, purchase_index)
   session[:message] = "Purchase successfully updated."
   redirect "/"
 end
@@ -436,9 +418,8 @@ end
 post "/budget/purchases/:purchase_id/delete" do
   require_signed_in_user
 
-  purchase_index = params[:purchase_id].to_i
+  @storage.delete_purchase(params[:purchase_id])
 
-  delete_purchase(purchase_index)
   session[:message] = "Purchase successfully deleted."
   redirect "/"
 end
@@ -446,10 +427,7 @@ end
 post "/budget/purchases/delete_all" do
   require_signed_in_user
 
-  purchases = []
-  File.open(get_yaml_path("spending.yaml"), "w") do |file|
-      file.write(purchases.to_yaml)
-    end
+  @storage.delete_all_purchases
 
   session[:message] = "All purchases have been successfully deleted. You're ready to start a fresh month!"
   redirect "/"

@@ -4,6 +4,9 @@ name text NOT NULL,
 amount numeric(6,2)
 );
 
+INSERT INTO categories (name, amount)
+VALUES                  ('Uncategorized', 0);
+
 CREATE TABLE purchases (
 id serial PRIMARY KEY,
 category_id integer REFERENCES categories (id),
@@ -16,8 +19,7 @@ ALTER TABLE purchases
 ADD CONSTRAINT fk_cat_purchase_id
 FOREIGN KEY (category_id)
 REFERENCES categories (id)
-ON DELETE CASCADE
-ON UPDATE CASCADE;
+ON DELETE CASCADE;
 
 
 CREATE TABLE income (
