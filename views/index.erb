@@ -1,20 +1,28 @@
-<header>
-  <h1>** Easy Budget ** </h1>
-  <h2 class="version">v1.0</h2>
-</header>
-  
+<div class="container" id="income">
+  <div class="row">
+    <div class="col">
+      <h2>Monthly Income:</h2>
+      $<strong><%= @income %></strong>
+    </div>
+    <div class="justify-content-end">
+      <div class="col">
+        <form class="inline" action="/budget/edit_income" method="get">
+          <input class="inline" type="submit" value="Edit Income" />
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <div class="container">
   <div class="row">
     <div class="col-sm">
       <h2>Monthly Income:</h2>
-      <ul>
-        <li class="expense-category">
         $<strong><%= @income %></strong>
-          <form class="inline" action="/budget/edit_income" method="get">
-            <button class="edit" type="submit">Edit Income</button>
-          </form>
-        </li>
-      </ul>
+        <form class="inline" action="/budget/edit_income" method="get">
+          <input class="inline" type="submit" value="Edit Income" />
+        </form>
     </div>
 
     <div class="col-sm">

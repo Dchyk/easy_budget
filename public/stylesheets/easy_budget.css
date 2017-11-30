@@ -1,90 +1,60 @@
 body {
-  padding: 1em;
-  font-family: sans-serif;
-}
-
-header {
+  width: 960px;
   margin: 0 auto;
+}
+h2 {
+  font-size: 1rem;
+}
+.navbar {
+  border-radius: 0 0 5px 5px;
+}
+.alert {
+  margin-top: 5px;
+}
+nav p {
+  color: #fff;
+  margin: 0;
+}
+nav p strong {
+  color: #00fffa;
+}
+nav p, nav form {
+  display: inline-block;
+}
+#user-info {
+  text-align: right;
+}
+#sign-out {
+  margin: 0 0 0 10px;
+}
+
+#income {
+  margin-top: 5px;
+  width: 50%;
+  background: lightblue;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+#income h2, strong {
+  display: inline-block;
+  padding: 5px 0 0 0;
+}
+
+
+
+
+
+
+
+
+/* Responsive styles */
+
+@media (max-width: 960px) {
+  body {
+    width: 100%;
+  }
+  #user-info, #easy-budget {
   text-align: center;
-  padding: 10px;
-  background-color: #93ffab;
-}
-
-.version {
-  font-size: 0.9em;
-}
-
-button.edit {
-  background: #EAFCFF;
-  border-radius: 8px;
-  padding: 8px 8px;
-  text-align: center;
-  text-decoration: none;
-}
-
-button.delete {
-  background: #FF8484;
-  border-radius: 8px;
-  padding: 8px 8px;
-  text-align: center;
-  text-decoration: none;
-}
-
-button.add {
-  background: #A7F9B3;
-  border-radius: 8px;
-  padding: 8px 8px;
-  text-align: center;
-  text-decoration: none;
-}
-
-.expense-category {
-  padding: 10px;
-  margin-bottom: 2px;
-  background: #AFF5FF;
-}
-
-.expense-category-warning {
-  padding: 10px;
-  margin-bottom: 2px;
-  background: #ff9e9e;
-}
-
-.purchase {
-  padding: 10px;
-  margin-bottom: 2px;
-  background: #ccd9ff;
-}
-.image {
-  padding: 10px;
-  margin-bottom: 2px;
-  background: #A7F9B3;
-}
-
-.message {
-  padding: 10px;
-  background: #FFFF99;
-}
-
-.warning {
-  padding: 10px;
-  background: #ff9e9e;
-}
-
-form.inline {
-  display: inline;
-}
-
-.user-status {
-  font-style: italic;
-  font-size: 0.9em;
-}
-
-.note {
-  font-style: italic;
-  font-size: 0.9em;
-}
-
-.form-item {
-  padding-bottom: 10px;
+  }
 }
