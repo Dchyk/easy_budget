@@ -89,6 +89,10 @@ class DatabasePersistence
   end
 
   def save_purchase(category_id, date, amount)
+    if amount.size == 0
+      amount = 0
+    end
+    
     sql = ("INSERT INTO purchases (category_id, date, amount) VALUES ($1, $2, $3)")
     query(sql, category_id, date, amount)
   end

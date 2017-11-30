@@ -136,13 +136,12 @@ def return_correct_date_format(date)
 end
 
 def valid_date?(date)
-
   date.match(/\b\d{1,2}\/\d{1,2}\/(\d{2}|\d{4})\b/)
 end
 
 def return_formatted_date(date)
   if yyyy_mm_dd_formatted(date)
-    date = return_correct_date_format
+    date = return_correct_date_format(date)
   end
 
   unless valid_date?(date)
@@ -167,9 +166,9 @@ helpers do
     category_purchases.map { |purchase| purchase[:amount].to_f }.inject(&:+) || 0
   end
 
-  # def total_spending_in_all_categories(purchases)
-  #   purchases.map { |purchase| purchase[:amount].to_f }.inject(&:+)
-  # end
+  def total_spending_in_all_categories(purchases)
+    purchases.map { |purchase| purchase[:amount].to_f }.inject(&:+)
+  end
 
   def total_money_budgeted
     budget = load_yaml_file("budget.yaml")

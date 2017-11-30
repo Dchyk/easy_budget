@@ -3,58 +3,61 @@
   <h2 class="version">v1.0</h2>
 </header>
   
-    
-<h2>Monthly Income:</h2>
-<ul>
-  <li class="expense-category">
-  $<strong><%= @income %></strong>
-    <form class="inline" action="/budget/edit_income" method="get">
-      <button class="edit" type="submit">Edit Income</button>
-    </form>
-  </li>
-</ul>
-<h2>Monthly Expense Categories:</h2>
-
-<% if @categories.size <= 1 %>
-  <p>You haven't added any categories yet!</p>
-<% else %>
-
-  <ul>
-    <% @categories[1..-1].each do |category| %>
-      <li class="expense-category">
-        <%= category[:name] %>: $<strong><%= category[:amount] %></strong>
-        <% if category[:id] != "1" %>
-          <form class="inline" action="/budget/<%= category[:id] %>/edit" method="get">
-            <button class="edit" type="submit">Edit</button>
+<div class="container">
+  <div class="row">
+    <div class="col-sm">
+      <h2>Monthly Income:</h2>
+      <ul>
+        <li class="expense-category">
+        $<strong><%= @income %></strong>
+          <form class="inline" action="/budget/edit_income" method="get">
+            <button class="edit" type="submit">Edit Income</button>
           </form>
-          <form class="inline delete" action="/budget/<%= category[:id] %>/delete" method="post">
-            <button class="delete" type="submit">Delete</button>
-          </form>
-        <% end %>
-      </li>
-    <% end %>
-  </ul>
+        </li>
+      </ul>
+    </div>
 
+    <div class="col-sm">
+      <h2>Monthly Expense Categories:</h2>
 
-<% end %>
+      <% if @categories.size <= 1 %>
+        <p>You haven't added any categories yet!</p>
+      <% else %>
+        <ul>
+          <% @categories[1..-1].each do |category| %>
+            <li class="expense-category">
+              <%= category[:name] %>: $<strong><%= category[:amount] %></strong>
+              <% if category[:id] != "1" %>
+                <form class="inline" action="/budget/<%= category[:id] %>/edit" method="get">
+                  <button class="edit" type="submit">Edit</button>
+                </form>
+                <form class="inline delete" action="/budget/<%= category[:id] %>/delete" method="post">
+                  <button class="delete" type="submit">Delete</button>
+                </form>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+      <form action="/budget/add_category" method="get">
+        <input value="Add Category" type="submit" />
+      </form>
+    </div>
 
-  <form action="/budget/add_category" method="get">
-    <button class="edit" type="submit">Add Category</button>
-  </form>
-
-  <h2>Total Categorized Expenses:</h2>
-    <ul>
-      <li class="expense-category">
-        $<strong><%= display_as_money(total_money_budgeted) %></strong> / <%= @income %>
-      </li>
-    </ul>
-  
-    <% if over_budget? %>
-      <p class="warning">WARNING: Your expenses currently exceed your monthly income!</p>
-    <% end %>
-
-  
-
+    <div class="col-sm">
+      <h2>Total Categorized Expenses:</h2>
+        <ul>
+          <li class="expense-category">
+            $<strong><%= display_as_money(total_money_budgeted) %></strong> / <%= @income %>
+          </li>
+        </ul>
+      
+        <!-- if over_budget? 
+          <p class="warning">WARNING: Your expenses currently exceed your monthly income!</p>
+         end  -->
+    </div>
+  </div>
+</div>
   <h2>Total spending this month:</h2>
 
     <ul>
