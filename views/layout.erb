@@ -11,9 +11,7 @@
     <link href="stylesheets/pizza.css" media="screen, projector, print" rel="stylesheet" type="text/css" />
     <script src="/javascripts/jquery-3.2.1.js"></script>
     <script src="/javascripts/application.js"></script>
-    <script>
-      Pizza.init();
-    </script>
+    
   </head>
 
   <body>
@@ -44,7 +42,16 @@
   <%= yield %>
   <!-- Main page content -->
 
-
+  <footer>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark" id="footer">
+      <div class="col-sm" id="easy-budget">
+        <a class="navbar-brand" href="#">Easy Budget v1.2</a>
+      </div>
+      <div class="col-sm" id="user-info">
+        <p>&copy; 2017 Alex Dzwonchyk</p>
+      </div>
+    </nav>
+  </footer>
   <!-- Boostrap JS -->
    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
@@ -56,7 +63,9 @@
     <script src="js/vendor/snap.svg.js"></script>
     <script src="js/jquery.pizza.js"></script>
     <!-- Pizza Pie Chart JS -->
-
+    <script>
+      Pizza.init();
+    </script>
   </body>
   
 </html>
