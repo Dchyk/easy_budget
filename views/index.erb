@@ -1,3 +1,38 @@
+<div class="container" id="metrics">
+  <div class="row">
+    <div class="col">
+      <ul data-pie-id="my-cool-chart">
+        <li data-value="36">Pepperoni</li>
+        <li data-value="14">Sausage</li>
+        <li data-value="8">Cheese</li>
+        <li data-value="11">Mushrooms</li>
+        <li data-value="7">Chicken</li>
+        <li data-value="24">Other</li>
+      </ul>
+      <div id="my-cool-chart"></div>
+      <h2 class="metric">Income</h2>
+    </div>
+    <div class="col">
+      <div class="pie-chart"></div>
+      <h2 class="metric">Spending</h2>
+    </div>
+    <div class="col">
+      <div class="pie-chart"></div>
+      <h2 class="metric">Tithing</h2>
+    </div>    
+  </div>
+</div>
+
+
+
+
+
+<div class-="container" id="add-purchase">
+  <form class="inline" action="/add_purchase" method="get">
+    <input class="edit" type="submit" value="Add a Purchase">
+  </form>
+</div>
+
 <div class="container" id="income">
   <div class="row">
     <div class="col">
@@ -14,58 +49,44 @@
   </div>
 </div>
 
-
 <div class="container">
-  <div class="row">
-    <div class="col-sm">
-      <h2>Monthly Income:</h2>
-        $<strong><%= @income %></strong>
-        <form class="inline" action="/budget/edit_income" method="get">
-          <input class="inline" type="submit" value="Edit Income" />
-        </form>
-    </div>
-
-    <div class="col-sm">
-      <h2>Monthly Expense Categories:</h2>
-
-      <% if @categories.size <= 1 %>
-        <p>You haven't added any categories yet!</p>
-      <% else %>
-        <ul>
-          <% @categories[1..-1].each do |category| %>
-            <li class="expense-category">
-              <%= category[:name] %>: $<strong><%= category[:amount] %></strong>
-              <% if category[:id] != "1" %>
-                <form class="inline" action="/budget/<%= category[:id] %>/edit" method="get">
-                  <button class="edit" type="submit">Edit</button>
-                </form>
-                <form class="inline delete" action="/budget/<%= category[:id] %>/delete" method="post">
-                  <button class="delete" type="submit">Delete</button>
-                </form>
-              <% end %>
-            </li>
-          <% end %>
-        </ul>
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Category</th>
+        <th scope="col">Budgeted</th>
+        <th scope="col">Spent</th>
+        <th scope="col">Remaining</th>
+        <th scope="col" colspan="2"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @categories[1..-1].each do |category| %>
+        <tr>
+          <td><%= category[:name] %></td>
+          <td><%= category[:amount] %></td>
+          <td><%= total_spending_in_one_category(@purchases, category[:name]) %></td>
+          <td>100.00</td>
+          <td>
+            <form class="inline" action="/budget/<%= category[:id] %>/edit" method="get">
+              <input class="edit" type="submit" value="Edit">
+            </form>
+          </td>
+          <td>
+            <form class="inline delete" action="/budget/<%= category[:id] %>/delete" method="post">
+              <input class="delete" type="submit" value="Delete">
+            </form>
+          </td>
+        <tr>
       <% end %>
-      <form action="/budget/add_category" method="get">
+    </tbody>
+  </table>
+  <form action="/budget/add_category" method="get">
         <input value="Add Category" type="submit" />
       </form>
-    </div>
-
-    <div class="col-sm">
-      <h2>Total Categorized Expenses:</h2>
-        <ul>
-          <li class="expense-category">
-            $<strong><%= display_as_money(total_money_budgeted) %></strong> / <%= @income %>
-          </li>
-        </ul>
-      
-        <!-- if over_budget? 
-          <p class="warning">WARNING: Your expenses currently exceed your monthly income!</p>
-         end  -->
-    </div>
-  </div>
 </div>
+
+
   <h2>Total spending this month:</h2>
 
     <ul>
