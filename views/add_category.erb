@@ -1,25 +1,29 @@
-<h1>Add a Category of Monthly Expenses:</h1>
+<h1 class="text-center">Add a Category</h1>
+<div class="container-fluid">
+  <div class="row">
+  <div class="col"></div>
+    <div class="col-md-auto">
+      <form class="inline" action="/budget/add_category" method="post">
+        
+          <label for="category_name">Category Name:</label>
 
-<form class="inline" action="/budget/add_category" method="post">
-  
-    <label for="category_name">Category Name:</label>
+          <div class="form-item">
+          <input name="category_name" id="category_name" placeholder="Ex. Gas, Groceries, etc">
+          </div>
 
-    <div class="form-item">
-    <input name="category_name" id="category_name" value="Ex. Gas, Groceries, etc">
+          <label for="amount">Amount to budget:</label>
+
+          <div class="form-item">
+          $<input type="number" min="0.00" max="100000.00" step="0.01" name="amount" id="amount" value="$0">
+          </div>
+
+          <input type="submit" value="Save">
+        </form>
+        <form class="inline" action="/" method="get">
+            <input type="submit" value="Cancel">
+        </form>
+      </div>
+      <div class="col"></div>
     </div>
-
-    <label for="amount">Amount to budget:</label>
-
-    <div class="form-item">
-    $<input type="number" min="0.00" max="100000.00" step="0.01" name="amount" id="amount" value="$0">
-    </div>
-
-    <button class="edit" type="submit">Save</button>
-</form>
-<form class="inline" action="/" method="get">
-    <button class="delete" type="submit">Cancel</button>
-</form>
-
-
-<h2>Total money budgeted so far: $<%= display_as_money(total_money_budgeted) %> <br/> Available to budget: $<%= display_as_money(money_available_to_budget) %></h2>
+</div>
 

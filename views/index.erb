@@ -19,7 +19,9 @@
       </form>
     </div>
     <div class="col">
-      <div class="pie-chart"></div>
+      <div class="pie-chart">
+        <h2>$<%= display_as_money(remaining_money(@purchases, @income)) %></h2>
+      </div>
       <h2 class="metric">Remaining</h2>
     </div>    
   </div>
@@ -41,15 +43,13 @@
         <tr>
           <td><%= category[:name] %></td>
           <td class="text-center">$<%= category[:amount] %></td>
-          <td class="text-center">$<%= total_spending_in_one_category(@purchases, category[:name]) %></td>
+          <td class="text-center">$<%= display_as_money(total_spending_in_one_category(@purchases, category[:name])) %></td>
           <td class="text-center">$100.00</td>
-          <td class="text-center">
-            <form class="inline" action="/budget/<%= category[:id] %>/edit" method="get">
+          <td class="text-right">
+            <form class="d-inline" action="/budget/<%= category[:id] %>/edit" method="get">
               <input class="edit" type="submit" value="Edit">
             </form>
-          </td>
-          <td class="text-center">
-            <form class="inline delete" action="/budget/<%= category[:id] %>/delete" method="post">
+            <form class="d-inline delete" action="/budget/<%= category[:id] %>/delete" method="post">
               <input class="delete" type="submit" value="Delete">
             </form>
           </td>
@@ -70,28 +70,26 @@
   <% if @purchases.empty? %>
     <h2>You haven't added any purchases yet!</h2>
   <% else %>
-    <table class="table">
+    <table class="table" id="purchases">
       <thead>
         <tr>
           <th scope="col">Date</th>
           <th scope="col" class="text-center">Amount</th>
           <th scope="col">Category</th>
-          <th scope="col" colspan="2"></th>
+          <th scope="col"></th>
         </tr>
       </thead>
       <tbody>
         <% @purchases.each do |purchase| %>
           <tr>
             <td><%= purchase[:date] %></td>
-            <td class="text-center"><%= purchase[:amount] %></td>
+            <td class="text-center">$<%= purchase[:amount] %></td>
             <td><%= purchase[:category] %></td> 
-            <td>
-              <form class="inline" action="/budget/purchases/<%= purchase[:id] %>/edit" method="get">
+            <td class="text-right">
+              <form class="d-inline" action="/budget/purchases/<%= purchase[:id] %>/edit" method="get">
                 <input class= "edit" type="submit" value="Edit">
               </form>
-            </td>
-            <td>
-              <form class="inline delete" action="/budget/purchases/<%= purchase[:id] %>/delete" method="post">
+              <form class="d-inline" action="/budget/purchases/<%= purchase[:id] %>/delete" method="post">
                 <input class="delete" type="submit" value="Delete">
               </form>
             </td>
@@ -115,3 +113,13 @@
   <% end %>
 </div>
 
+<footer>
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark" id="footer">
+    <div class="col-sm" id="easy-budget">
+      <a class="navbar-brand" href="#">Easy Budget v1.2</a>
+    </div>
+    <div class="col-sm" id="user-info">
+      <p>&copy; 2017 Alex Dzwonchyk</p>
+    </div>
+  </nav>
+</footer>

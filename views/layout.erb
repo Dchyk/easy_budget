@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Easy Budget</title>
+    <title>Easy Monthly Budget</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -17,7 +17,7 @@
   <body>
   <nav class="navbar navbar-expand-md navbar-dark bg-dark">
     <div class="col-sm" id="easy-budget">
-      <a class="navbar-brand" href="#">Easy Budget v1.2</a>
+      <a class="navbar-brand" href="#">Easy Monthly Budget v1.2</a>
     </div>
     <div class="col-sm" id="user-info">
       <% if session[:username] %>
@@ -25,33 +25,20 @@
         <form action="/users/signout" method="post">
           <input type="submit" id="sign-out" value="Sign Out" />
         </form>
-      <% else %>
-        <form action="/users/signin" method="get">
-          <input type="submit" value="Sign In" />
-        </form>
       <% end %>
     </div>
   </nav>
 
   <!-- Alert -->
   <% if session[:message] %>
-    <div class="alert alert-success"><%= session.delete(:message) %></div>
+    <div class="alert <%= session[:alert_class] %>"><%= session.delete(:message) %></div>
   <% end %>
 
   <!-- Main page content -->
   <%= yield %>
   <!-- Main page content -->
 
-  <footer>
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark" id="footer">
-      <div class="col-sm" id="easy-budget">
-        <a class="navbar-brand" href="#">Easy Budget v1.2</a>
-      </div>
-      <div class="col-sm" id="user-info">
-        <p>&copy; 2017 Alex Dzwonchyk</p>
-      </div>
-    </nav>
-  </footer>
+ 
   <!-- Boostrap JS -->
    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>

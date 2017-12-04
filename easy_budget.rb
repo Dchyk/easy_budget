@@ -51,65 +51,6 @@ def format_money(number)
   number.to_f.round(2).to_s
 end
 
-def save_purchase(purchase)
-  purchases = load_yaml_file("spending.yaml")
-  
-  if purchases.nil?
-    purchases = []
-  end
-
-  purchases << purchase
-
-  File.open(get_yaml_path("spending.yaml"), "w") do |file|
-      file.write(purchases.to_yaml)
-    end
-end
-
-def update_purchase(purchase, index)
-  purchases = load_yaml_file("spending.yaml")
-
-  purchases[index] = purchase
-
-  File.open(get_yaml_path("spending.yaml"), "w") do |file|
-      file.write(purchases.to_yaml)
-    end
-end
-
-def delete_purchase(index)
-  purchases = load_yaml_file("spending.yaml")
-
-  purchases.delete_at(index)
-
-  File.open(get_yaml_path("spending.yaml"), "w") do |file|
-      file.write(purchases.to_yaml)
-    end
-end
-
-def save_income(income)
-  budget_file = load_yaml_file("budget.yaml")
-  budget_file[:monthly_income] = income
-
-  save_budget_data_to_yaml(budget_file)
-end
-
-def add_expense_category(category_name, amount)
-  budget_file = load_yaml_file("budget.yaml")
-
-  if budget_file[:categories].nil?
-    budget_file[:categories] = { category_name => amount }
-  else
-    budget_file[:categories][category_name] = amount
-  end
-
-  save_budget_data_to_yaml(budget_file)
-end
-
-def save_budget_data_to_yaml(budget_data)
-  File.open(get_yaml_path("budget.yaml"), "w") do |file|
-      file.write(budget_data.to_yaml)
-    end  
-end
-
 def invalid_number?(input)
   no_value?(input) || !valid_number?(input)
 end
@@ -167,7 +108,11 @@ helpers do
   end
 
   def total_spending_in_all_categories(purchases)
-    purchases.map { |purchase| purchase[:amount].to_f }.inject(&:+)
+    purchases.map { |purchase| purchase[:amount].to_f }.inject(&:+) || 0
+  end
+
+  def remaining_money(purchases, income)
+    income.to_f - total_spending_in_all_categories(purchases)
   end
 
   def total_money_budgeted
@@ -186,31 +131,6 @@ helpers do
     budget = load_yaml_file("budget.yaml")
     budget[:monthly_income].to_f.round(2)
   end
-
-  #def over_budget?
-  #  total_money_budgeted > monthly_income
-  #end
-
-  #def over_total_budget?
-  #  total_spending_in_all_categories > money_available_to_budget
-  #end
-
-  #def category_over_budget?(category)
-  #  spending in category > budgeted for that category
-  #  spending = load_yaml_file("spending.yaml")
-  #  budget = load_yaml_file("budget.yaml")
-  #  budgeted_for_category = budget[:categories][category].to_f
-
-  #  total_spending_in_one_category(purchases, category) > budgeted_for_category
-  #end
-
-  # def get_category_class(category)
-  #   if category_over_budget?(category)
-  #     "expense-category-warning"
-  #   else
-  #     "expense-category"
-  #   end
-  # end
 
   def todays_date
     date = Time.now
@@ -264,9 +184,11 @@ post "/users/signin" do
   if users[username] == password
     session[:username] = username
     session[:message]  = "Welcome, #{username}!"
+    session[:alert_class] = "alert-success"
     redirect "/"
   else
     session[:message] = "Invalid credentials."
+    session[:alert_class] = "alert-danger"
     erb :signin
   end
 end

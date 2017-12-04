@@ -1,22 +1,26 @@
-<h1>Welcome to Easy Budget</h1>
-<h2 class="note">You must be logged in to view and edit your budget</h2>
 
-<p>Please enter your username and password:</p>
+<h1 class="text-center" id="sign-in">Sign In</h1>
+<div class="container-fluid">
+  <div class="row">
+  <div class="col"></div>
+    <div class="col-md-auto">
+      <form action="/users/signin" method="post" >
+        
+          <label for="username" class="text-left">Username:</label>
 
-<form action="/users/signin" method="post">
-  
-    <label for="username">Username:</label>
+          <div class="form-item">
+            <input name="username" id="username">
+          </div>
 
-    <div class="form-item">
-    <input name="username" id="username">
+          <label for="password" class="text-left">Password:</label>
+
+          <div class="form-item">
+            <input type="password" name="password" id="password">
+          </div>
+
+          <input class="edit" type="submit" value="Sign In">
+      </form>
+      </div>
+      <div class="col"></div>
     </div>
-
-    <label for="password">Password:</label>
-
-    <div class="form-item">
-    <input name="password" id="password">
-    </div>
-
-    <button class="edit" type="submit">Sign In</button>
-</form>
-
+</div>

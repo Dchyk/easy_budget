@@ -87,18 +87,33 @@ thead {
   background: #e0f5fc;
 }
 
-thead tr th:first-of-type {
-  border-top-left-radius: 5px;
+.table td, .table th {
+  padding: .5rem;
 }
-
 #purchases {
   margin: 30px 0 30px 0;
-  box-sizing: border-box;
+}
+
+#purchases tr:nth-of-type(2n) {
+  background: #efefef;
 }
 
 #footer {
   border-radius: 5px 5px 0 0;
 }
+
+#sign-in {
+  padding: 30px 0 0 0;
+}
+
+.sub-page {
+  padding: 30px 0;
+}
+
+input[type="number"] {
+  margin: 0 0 10px 0;
+}
+
 /* Responsive styles */
 
 @media (max-width: 960px) {
