@@ -14,7 +14,6 @@ date DATE,
 amount numeric(6, 2)
 );
 
-# Note - update the CREATE TABLE above with this
 ALTER TABLE purchases
 ADD CONSTRAINT fk_cat_purchase_id
 FOREIGN KEY (category_id)
