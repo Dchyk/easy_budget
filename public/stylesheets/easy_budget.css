@@ -3,44 +3,34 @@ body {
   margin: 0 auto;
 }
 
+/* Top navbar */
+
 .navbar {
   border-radius: 0 0 5px 5px;
 }
+
 .alert {
   margin-top: 5px;
 }
+
 nav p {
   color: #fff;
   margin: 0;
 }
+
 nav p strong {
   color: #00fffa;
 }
+
 nav p, nav form {
   display: inline-block;
 }
+
 #user-info {
   text-align: right;
 }
 #sign-out {
   margin: 0 0 0 10px;
-}
-
-#add-purchase {
-  text-align: center;
-  margin: 0 auto;
-}
-
-#income, #add-purchase {
-  margin-top: 5px;
-  background: lightblue;
-  padding: 5px;
-  border-radius: 5px;
-}
-
-#income h2, strong {
-  display: inline-block;
-  padding: 5px 0 0 0;
 }
 
 table {
@@ -112,6 +102,10 @@ thead {
 
 input[type="number"] {
   margin: 0 0 10px 0;
+}
+
+input[type="submit"]:last-of-type {
+  margin: 15px 0 0 0;
 }
 
 /* Responsive styles */
